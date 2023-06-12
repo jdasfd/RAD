@@ -1,0 +1,4 @@
+1. Add gff extraction function into the perl module
+2. Add a script aimed to extract longest peptides
+3. Add parameter passer for all perl scripts
+4. Deal with ECD
