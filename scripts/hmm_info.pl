@@ -31,8 +31,7 @@ die usage() if $input eq "help";
 if ( !defined $input ) {
     die ("Input a file please.")
 }
-elsif {
-    !path($input)->is_file;
+elsif ( !path($input)->is_file ) {
     die ("Error: can't find file [$input]");
 }
 
@@ -40,26 +39,37 @@ elsif {
 # init
 #----------------------------------------------------------#
 
-my $readline;
-my @output;
+my ($readline, $line_num);
+my @output = ();
 
-open my $fh_in, "<", $input;
+open my $fh_in, '<', $input;
 while( <$fh_in> ) {
-    if ( $_ =~ /\\\\/ ) {
-        $readline =~ /NAME\s+?(\S.+?)\nACC\s+?(\S.+?)\nDESC\s+(\S.+?)\nLENG\s+(\d+?)\n/;
-        my $NAME = $1;
-        my $ACC = $2;
-        my $DESC = $3;
-        my $LENG = $4;
-        $DESC = s/\s/_/g;
-        my $for_print = "$NAME\t$ACC\t$DESC\t$LENG\n";
-        push @output, $for_print;
-        $readline = "";
+    $line_num++;
+    if ( $_ =~ /\/\// ) {
+        if ( $readline =~ /NAME\s+?(\w.*?)\nACC\s+?(\w.+?)\nDESC\s+?(.+?)\nLENG\s+(\d+?)\n/ ){
+            my $NAME = $1;
+            my $ACC = $2;
+            my $DESC = $3;
+            my $LENG = $4;
+            $DESC =~ s/\s/_/g;
+            my $for_print = "$NAME\t$ACC\t$DESC\t$LENG\n";
+            push @output, $for_print;
+            $readline = "";
+        }
+        else {
+            print STDERR "Warning: HMM info extraction failed at line $line_num.\n";
+            $readline = "";
+        }
     }
-    else {
+    elsif ( $_ =~ /^\w/) {
         $readline .= $_;
     }
+    else {
+        next;
+    }
 }
+
+close $fh_in;
 
 END{
     print "NAME\tACC\tDESC\tLENG\n";
