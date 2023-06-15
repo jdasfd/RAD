@@ -1,7 +1,11 @@
 #!/usr/bin/perl -w
-# Author: Yuqian Jiang
+#
 # A simple script for extracting pfam info.
-# Date: latest update on 6/14/2023
+#
+# Author: Yuqian Jiang
+# Created: 2023-06-14
+# Updated: 2023-06-15
+# Version: 1.0.0
 
 use strict;
 use warnings;
@@ -14,11 +18,11 @@ use Path::Tiny;
 
 =head1 NAME
 
-pfam_list.pl - extract info from pfam.hmm database
+hmm_info.pl - extract info from .hmm files
 
 =head1 SYNOPSIS
 
-    perl pfam_list.pl <input_file>
+    perl hmm_info.pl <input_file> [help]
     A script for extracting info from pfam-hmm database.
 
     Options:
@@ -71,16 +75,14 @@ while( <$fh_in> ) {
 
 close $fh_in;
 
-END{
-    print "NAME\tACC\tDESC\tLENG\n";
-    foreach (@output) {
-        print $_;
-    }
+print "NAME\tACC\tDESC\tLENG\n";
+foreach (@output) {
+    print $_;
 }
 
 sub usage{
     my $help_str = <<"EOF";
-    perl pfam_list.pl <input_file>
+    perl hmm_info.pl <input_file> [help] > info.tsv
     A script for extracting info from pfam-hmm database.
 
     Options:
