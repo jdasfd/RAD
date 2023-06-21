@@ -16,7 +16,7 @@ raid::MyFileIO - Local perl module for operating files
 
 =head1 SYNOPSIS
 
-    use raid::MyFileIO qw();
+    use raid::MyFileIO;
 
 =cut
 
@@ -146,7 +146,7 @@ sub get_longest_trans {
     my ($seq_hash, $in) = @_;
     my %mRNAs_all;
     my %locus;
-    my $fh = raid::MyFileIO::getInputFilehandle($in);
+    my $fh = getInputFilehandle($in);
     while( <$fh> ) {
         next if (/^\#/ || /^\s+$/);
         chomp;
