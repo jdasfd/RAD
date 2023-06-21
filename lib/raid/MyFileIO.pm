@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #
 # MyFileIO.pm -- Process of files
 #
@@ -7,7 +7,8 @@
 # Version: 1.0.0
 #
 # Change logs:
-# Version 1.0.0 2023-06-08: Initial version
+# Version 1.0.0 2023-06-08: Initial version. Add function getInputFilehandle, read_pred.
+# Version 1.1.0 2023-06-21: Add function get_longest_trans
 
 =head1 NAME
 
@@ -20,11 +21,10 @@ raid::MyFileIO - Local perl module for operating files
 =cut
 
 package raid::MyFileIO;
+
 use strict;
 use warnings;
 use autodie;
-use Bio::Seq;
-use Bio::SeqIO;
 
 =head1 METHODS
 
@@ -84,7 +84,7 @@ sub getInputFilehandle
 
 =cut
 sub read_pred {
-    my ($rf_seq, $in) = @_;
+    my ($seq_hash, $in) = @_;
     my @id_list;
 
     my $fh = getInputFilehandle($in);
@@ -123,14 +123,74 @@ sub read_pred {
         my $len_tm = length($tmindex);
 
         unless ( $len_seq != $len_tm ) {
-            if ( ref($rf_seq) eq 'HASH' ) {
-                $rf_seq -> {$id} = $tmindex;
+            if ( ref($seq_hash) eq 'HASH' ) {
+                $seq_hash -> {$id} = $tmindex;
             }
         }
         # save id
         push @id_list, $id;
     }
     return (@id_list);
+}
+
+=head2 get_longest_trans
+
+    About : Get the longest transcript as the representative transcript
+    Usage : get_longest_trans(\%LONGEST_TRANS, $gff_file);
+     Args : Reference to a hash to contain all longest trans;
+            gff filename (.gff3 format);
+  Returns : none
+
+=cut
+sub get_longest_trans {
+    my ($seq_hash, $in) = @_;
+    my %mRNAs_all;
+    my %locus;
+    my $fh = raid::MyFileIO::getInputFilehandle($in);
+    while( <$fh> ) {
+        next if (/^\#/ || /^\s+$/);
+        chomp;
+        my ($feature, $start, $end) = (split /\t/)[2,3,4];
+
+        if ( $feature =~ /(mRNA|pseudogenic\_transcript)/ ) {
+            m{
+                ^(.*?)\s+.*?                   # Chromosome ID
+                \s+(\d+)                       # Start Position
+                \s+(\d+)\s+.*                  # End Position
+                \s+(\-|\+)\s+\.                # Strand
+                \s+ID\=(.*?)\;.*               # ID
+                (Parent|Locus_id)\=(.*?)(;|$)  # Parent
+            }x;
+
+            my ($id, $parent) = ($5, $7);
+            if ( $id eq "" ) {
+                next;
+            }
+            else {
+                $locus{$id} = $parent;
+            }
+
+            my $length = $end - $start + 1;
+
+            if ( $mRNAs_all{$parent} -> {represent} ) {
+                if ($mRNAs_all{$parent} -> {length} < $length) {
+                    $mRNAs_all{$parent} -> {represent} = $id;
+                    $mRNAs_all{$parent} -> {length} = $length;
+                }
+            }
+            else {
+                $mRNAs_all{$parent} -> {represent} = $id;
+                $mRNAs_all{$parent} -> {length} = $length;
+            }
+        }
+    }
+
+    for my $mRNA (keys %mRNAs_all)
+    {
+        my $represent_id = $mRNAs_all{$mRNA} -> {represent};
+
+        $seq_hash -> {$represent_id} = $mRNA;
+    }
 }
 
 1;
@@ -150,6 +210,8 @@ This software is copyright (c) 2023 by Yuqian Jiang.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-Special thanks to Nowind, noitulove9891@gmail.com
+Special thanks to:
+Qiang Wang, wangq@outlook.com
+Nowind, noitulove9891@gmail.com
 
 =cut
