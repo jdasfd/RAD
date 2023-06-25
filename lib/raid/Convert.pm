@@ -30,6 +30,9 @@ use autodie;
 =head2 ECD_convert
 
 =cut
+sub ECD_convert {
+    my @
+}
 
 =head2 codon_translate
 

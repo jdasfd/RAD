@@ -15,12 +15,9 @@ use warnings;
 
 use Getopt::Long;
 use Path::Tiny;
-use Bio::Seq;
-use Bio::SeqIO;
 use FindBin qw/$Bin/;
 use lib "$FindBin::Bin/lib/";
 use raid::MyFileIO;
-use Data::Dumper;
 
 #----------------------------------------------------------#
 # GetOpt section

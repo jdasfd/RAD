@@ -24,7 +24,6 @@ package raid::MyFileIO;
 
 use strict;
 use warnings;
-use autodie;
 
 =head1 METHODS
 
@@ -135,7 +134,7 @@ sub read_pred {
 
 =head2 get_longest_trans
 
-    About : Get the longest transcript as the representative transcript
+    About : Get the longest transcript as the representative transcript (NCBI format)
     Usage : get_longest_trans(\%LONGEST_TRANS, $gff_file);
      Args : Reference to a hash to contain all longest trans;
             gff filename (.gff3 format);
