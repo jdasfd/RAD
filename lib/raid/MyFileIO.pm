@@ -11,6 +11,7 @@
 # Version 1.1.0 2023-06-21: Add function get_represent_trans and rename it to get_longest_trans.
 # Version 1.1.1 2023-06-25: Modified get_longest_trans codes.
 # Version 1.1.2 2023-06-26: Fixes bugs: skip empty lines and accept transcript annotation.
+# Version 1.2.0 2023-06-26: Add function print_out.
 
 =head1 NAME
 
@@ -73,6 +74,33 @@ sub getInputFilehandle
     open (my $fh, $expr) || die $!;
 
     return $fh;
+}
+
+=head2 print_out
+
+    About : Output lines saved in the print array
+    Usage : print_out(\@for_print, $out_file);
+     Args : Reference to an array to hold all the content;
+            Output file (stdout or filename);
+  Returns : None
+
+=cut
+sub print_out{
+    my $out_fh;
+    my ($print_array, $out) = @_;
+
+    if ( lc($out) eq "stdout" ) {
+        $out_fh = *STDOUT;
+    }
+    else {
+        open $out_fh, ">", $out;
+    }
+
+    for (@{$print_array}) {
+        print {$out_fh} $_ . "\n";
+    }
+
+    close $out_fh;
 }
 
 =head2 read_pred
