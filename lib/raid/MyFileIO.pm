@@ -8,7 +8,9 @@
 #
 # Change logs:
 # Version 1.0.0 2023-06-08: Initial version. Add function getInputFilehandle, read_pred.
-# Version 1.1.0 2023-06-21: Add function get_longest_trans
+# Version 1.1.0 2023-06-21: Add function get_represent_trans and rename it to get_longest_trans.
+# Version 1.1.1 2023-06-25: Modified get_longest_trans codes.
+# Version 1.1.2 2023-06-26: Fixes bugs: skip empty lines and accept transcript annotation.
 
 =head1 NAME
 
@@ -138,20 +140,19 @@ sub read_pred {
     Usage : get_longest_trans(\%LONGEST_TRANS, $gff_file);
      Args : Reference to a hash to contain all longest trans;
             gff filename (.gff3 format);
-  Returns : none
+  Returns : longest transcripts hash [key: transcript id -> value: mRNA parent id]
 
 =cut
 sub get_longest_trans {
     my ($seq_hash, $in) = @_;
     my %mRNAs_all;
-    my %locus;
     my $fh = getInputFilehandle($in);
     while( <$fh> ) {
-        next if (/^\#/ || /^\s+$/);
+        next if (/^\#/ || /^\s+$/ || /^$/);
         chomp;
         my ($feature, $start, $end) = (split /\t/)[2,3,4];
 
-        if ( $feature =~ /(mRNA|pseudogenic\_transcript)/ ) {
+        if ( $feature =~ /(mRNA|pseudogenic\_transcript|transcript)/ ) {
             m{
                 ^(.*?)\s+.*?                   # Chromosome ID
                 \s+(\d+)                       # Start Position
@@ -162,12 +163,6 @@ sub get_longest_trans {
             }x;
 
             my ($id, $parent) = ($5, $7);
-            if ( $id eq "" ) {
-                next;
-            }
-            else {
-                $locus{$id} = $parent;
-            }
 
             my $length = $end - $start + 1;
 
