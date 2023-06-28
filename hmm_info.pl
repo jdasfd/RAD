@@ -4,8 +4,10 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-14
-# Updated: 2023-06-15
-# Version: 1.0.0
+
+# Change logs:
+# Version: 1.0.0 23-06-14: The initial version.
+# Version: 1.0.1 23-06-28: Bug fixes: Col3 DESC will remove the first _, add a judge of the input file.
 
 use strict;
 use warnings;
@@ -22,7 +24,7 @@ hmm_info.pl - extract info from .hmm files
 
 =head1 SYNOPSIS
 
-    perl hmm_info.pl <input_file> [help]
+    perl hmm_info.pl <input_file> > info.tsv
     A script for extracting info from pfam-hmm database.
 
     Options:
@@ -35,8 +37,11 @@ die usage() if $input eq "help";
 if ( !defined $input ) {
     die ("Input a file please.")
 }
-elsif ( !path($input)->is_file ) {
-    die ("Error: can't find file [$input]");
+elsif ( !path($input) -> is_file ) {
+    die ("Error: can't find file [$input].");
+}
+elsif ( !$input =~ /\.hmm.*$/ ) {
+    die ("Error: input a .hmm file please.");
 }
 
 #----------------------------------------------------------#
@@ -56,6 +61,7 @@ while( <$fh_in> ) {
             my $DESC = $3;
             my $LENG = $4;
             $DESC =~ s/\s/_/g;
+            $DESC =~ s/^_//;
             my $for_print = "$NAME\t$ACC\t$DESC\t$LENG\n";
             push @output, $for_print;
             $readline = "";
@@ -82,7 +88,7 @@ foreach (@output) {
 
 sub usage{
     my $help_str = <<"EOF";
-    perl hmm_info.pl <input_file> [help] > info.tsv
+    perl hmm_info.pl <input_file> > info.tsv
     A script for extracting info from pfam-hmm database.
 
     Options:
