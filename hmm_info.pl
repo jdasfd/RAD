@@ -8,11 +8,16 @@
 # Change logs:
 # Version: 1.0.0 23-06-14: The initial version.
 # Version: 1.0.1 23-06-28: Bug fixes: Col3 DESC will remove the first _, add a judge of the input file.
+# Version: 1.1.0 23-06-28: Add GetOptions part and use MyFileIO module.
 
 use strict;
 use warnings;
 use autodie;
 use Path::Tiny;
+use Getopt::Long;
+use FindBin qw/$Bin/;
+use lib "$FindBin::Bin/lib/";
+use raid::MyFileIO;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -24,21 +29,27 @@ hmm_info.pl - extract info from .hmm files
 
 =head1 SYNOPSIS
 
-    perl hmm_info.pl <input_file> > info.tsv
+    perl hmm_info.pl -i <input_hmm> [options]
     A script for extracting info from pfam-hmm database.
 
-    Options:
-    help: show help message
+      Options:
+        --input    -i STR   input hmm file
+        --out      -o STR   output file, default: STDOUT
+        --help     -h       show help message
+
 =cut
 
-my $input = $ARGV[0];
+GetOptions(
+    'help|h'    => sub { Getopt::Long::HelpMessage(0) },
+    'in|i=s'    => \( my $input ),
+    'out|o=s'   => \( my $out = 'stdout' ),
+) or Getopt::Long::HelpMessage(1);
 
-die usage() if $input eq "help";
 if ( !defined $input ) {
-    die ("Input a file please.")
+    die Getopt::Long::HelpMessage(1);
 }
 elsif ( !path($input) -> is_file ) {
-    die ("Error: can't find file [$input].");
+    die "Error: can't find file [$input]";
 }
 elsif ( !$input =~ /\.hmm.*$/ ) {
     die ("Error: input a .hmm file please.");
@@ -51,7 +62,7 @@ elsif ( !$input =~ /\.hmm.*$/ ) {
 my ($readline, $line_num);
 my @output = ();
 
-open my $fh_in, '<', $input;
+my $fh_in = raid::MyFileIO::getInputFilehandle($input);
 while( <$fh_in> ) {
     $line_num++;
     if ( $_ =~ /\/\// ) {
@@ -62,7 +73,7 @@ while( <$fh_in> ) {
             my $LENG = $4;
             $DESC =~ s/\s/_/g;
             $DESC =~ s/^_//;
-            my $for_print = "$NAME\t$ACC\t$DESC\t$LENG\n";
+            my $for_print = "$NAME\t$ACC\t$DESC\t$LENG";
             push @output, $for_print;
             $readline = "";
         }
@@ -81,18 +92,7 @@ while( <$fh_in> ) {
 
 close $fh_in;
 
-print "NAME\tACC\tDESC\tLENG\n";
-foreach (@output) {
-    print $_;
-}
+my $head = "NAME\tACC\tDESC\tLENG";
+push @output, $head;
 
-sub usage{
-    my $help_str = <<"EOF";
-    perl hmm_info.pl <input_file> > info.tsv
-    A script for extracting info from pfam-hmm database.
-
-    Options:
-    help: show help message
-EOF
-    return $help_str;
-}
+raid::MyFileIO::print_out(\@output, $out);
