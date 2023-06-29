@@ -96,3 +96,5 @@ my $head = "NAME\tACC\tDESC\tLENG";
 push @output, $head;
 
 raid::MyFileIO::print_out(\@output, $out);
+
+__END__
