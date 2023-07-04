@@ -3,11 +3,11 @@
 # A simple script extract hmmscan txt output results.
 #
 # Author: Yuqian Jiang
-# Created: 2023-06-28
-
+# Created: 2023-06-14
+# Version: 1.0.0
+#
 # Change logs:
 # Version: 1.0.0 23-06-14: The initial version, move from the RLK_family repo.
-# Version: 1.0.1 23-06-29: Add more code for skipping empty query.
 
 use strict;
 use warnings;
@@ -31,10 +31,14 @@ hmm_result.pl - transform hmm results to tsv format
     perl hmm_result.pl -i <input_file> [stdout|-o output_file]
     A script for hmm results transforming.
 
-Options:
-    -i,--in STR     input file name (in txt format only)
-    -o,--out STR    output file, default: STDOUT
-    -h,--help       help information
+    Options:
+        -i,--in STR     input file name (in txt format only)
+        -o,--out STR    output file, default: STDOUT
+        -h,--help       help information
+
+    Usage:
+    perl hmm_result.pl -i hmm_out.txt > file
+    perl hmm_result.pl -i hmm_out.txt -o file
 
 =cut
 

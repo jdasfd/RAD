@@ -1,8 +1,10 @@
 #!/usr/bin/perl -w
-# Author: Yuqian Jiang
+#
 # Inspired by faops
 # A simple script for acquiring sub-domain sequence by truncating.
-# Date: latest update on 3/27/2023
+#
+# Author: Yuqian Jiang
+# Created: 2023-03-27
 
 use strict;
 use warnings;

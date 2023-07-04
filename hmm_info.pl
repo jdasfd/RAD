@@ -4,7 +4,8 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-14
-
+# Version: 1.1.0
+#
 # Change logs:
 # Version: 1.0.0 23-06-14: The initial version.
 # Version: 1.0.1 23-06-28: Bug fixes: Col3 DESC will remove the first _, add a judge of the input file.
