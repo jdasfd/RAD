@@ -8,6 +8,7 @@
 #
 # Change logs:
 # Version 1.0.0 23-07-05: The initial version.
+# Version 1.0.1 23-07-05: Bug fixes. Remove arg: --changestop. Default change id and stop codon.
 
 use strict;
 use warnings;
@@ -31,12 +32,15 @@ seq_filter.pl - discard unqualified sequences
 =head1 SYNOPSIS
 
     perl seq_filter.pl -f <fasta_file> [options]
-      Options:
+
+    Default: Stop codon will be replaced to *
+             ID with : will be replaced to _
+
+    Options:
         --help          -h          brief help message
         --fasta         -f  STR     fasta file for quality control
         --length        -l  NUM     remove seqs longer than this number (bp)
         --prestop                   remove seqs with premature stop codon
-        --changestop                change stop codon into *
         --out           -o  STR     output file name, default: STDOUT
 
     perl seq_replace.pl -f seq.fa [options]
@@ -48,7 +52,6 @@ GetOptions(
     'fasta|f=s'  => \(my $fasta_file),
     'length|l=i' => \(my $length),
     'prestop'    => \(my $prestop),
-    'changestop' => \(my $changestop),
     'out|o=s'    => \(my $out = 'stdout'),
 ) or Getopt::Long::HelpMessage(1);
 
@@ -76,21 +79,15 @@ my $seqIOobj = Bio::SeqIO -> new(
 while((my $seqobj = $seqIOobj -> next_seq())) {
     my $id = $seqobj -> id();
     my $seq = $seqobj -> seq();
+    # modified ids and seqs here
+    $id =~ s/:/_/g;
+    $seq =~ s/\.$/\*/ if $seq =~ /\.$/;
     $SEQUENCE{$id} = $seq;
 }
 
 #----------------------------------------------------------#
-# sub
+# main
 #----------------------------------------------------------#
-
-# change stop codon to *
-if ( defined $changestop ) {
-    for my $id ( keys %SEQUENCE ) {
-        my $seq = $SEQUENCE{$id};
-        $seq =~ s/\.$/\*/ if $seq =~ /\.$/;
-        $SEQUENCE{$id} = $seq;
-    }
-}
 
 # remove prestop & length
 if ( defined $prestop && defined $length ) {
@@ -147,8 +144,7 @@ sub filter_pre_stop {
 
     for my $id ( keys %{$seq_hash} ) {
         my $seq = $seq_hash -> {$id};
-        $seq =~ s/\*$// if $seq =~ /\*$/;
-        push @filter, $seq if $seq =~ /\*/;
+        push @filter, $seq unless $seq =~ /\*/;
     }
 
     return @filter;
