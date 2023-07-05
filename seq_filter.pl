@@ -27,23 +27,23 @@ use raid::MyFileIO;
 
 =head1 NAME
 
-seq_filter.pl - discard unqualified sequences
+seq_filter.pl - discard unqualified sequences of proteins (peptides)
 
 =head1 SYNOPSIS
 
+    seq_filter.pl - discard unqualified sequences of proteins (peptides)
+
     perl seq_filter.pl -f <fasta_file> [options]
 
-    Default: Stop codon will be replaced to *
-             ID with : will be replaced to _
+    Notice: Stop codon will be replaced to * (default)
+            ID with : will be replaced to _ (default)
 
     Options:
         --help          -h          brief help message
-        --fasta         -f  STR     fasta file for quality control
-        --longest       -l  NUM     remove seqs longer than this number (bp)
-        --prestop                   remove seqs with premature stop codon
+        --fasta         -f  STR     pep fasta file for quality control
+        --longest       -l  NUM     remove seqs longer than this number (aa)
+        --prestop                   remove seqs with premature stop codon (pep: * as stop codon)
         --out           -o  STR     output file name, default: STDOUT
-
-    perl seq_replace.pl -f seq.fa [options]
 
 =cut
 

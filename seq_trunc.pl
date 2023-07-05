@@ -25,13 +25,14 @@ seq_trunc.pl - extract truncated sequence by giving a region
 
 =head1 SYNOPSIS
 
+    seq_trunc.pl - extract truncated sequence by giving a region
+
     perl seq_trunc.pl -f <fasta_file> -t <tsv_file>
-      Options:
+
+    Options:
         --help          -h          brief help message
         --fasta         -f  STR     fasta file
         --tsv           -t  STR     tsv file (col1: gene, col2: start, col3: end, col4: domain name)
-
-    perl seq_trunc.pl -f seq.fa -l trunc_info.tsv
 
 =cut
 

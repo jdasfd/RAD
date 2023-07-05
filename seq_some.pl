@@ -21,17 +21,18 @@ use Bio::SeqIO;
 
 =head1 NAME
 
-seq_some.pl - extract sequence by ID
+seq_some.pl - extract sequence by ID list
 
 =head1 SYNOPSIS
 
+    seq_some.pl - extract sequence by ID list
+
     perl seq_some.pl -f <fasta_file> -l <list_file>
-      Options:
+
+    Options:
         --help          -h          brief help message
         --fasta         -f  STR     fasta file
         --list          -l  STR     ID list file
-
-    perl seq_some.pl -f seq.fa -l seq_ID.lst
 
 =cut
 

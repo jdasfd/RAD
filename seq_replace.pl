@@ -25,13 +25,14 @@ seq_replace.pl - extract sequence by ID
 
 =head1 SYNOPSIS
 
+    seq_replace.pl - replace seq id according to tsv
+
     perl seq_replace.pl -f <fasta_file> -t <tsv_file>
-      Options:
+
+    Options:
         --help          -h          brief help message
         --fasta         -f  STR     fasta file
         --tsv           -t  STR     Replace name in tsv format (col1: raw name, col2: replacing name)
-
-    perl seq_replace.pl -f seq.fa -t seq_ID.tsv
 
 =cut
 
