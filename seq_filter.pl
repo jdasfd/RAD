@@ -126,7 +126,7 @@ sub filter_len {
     my @filter;
 
     for my $id ( keys %{$seq_hash} ) {
-        my $seq = $seq_hash -> $id;
+        my $seq = $seq_hash -> {$id};
         my $seq_len = length($seq);
         if ( $seq_len <= $len ) {
             push @filter, $id;
@@ -146,7 +146,7 @@ sub filter_pre_stop {
     my @filter;
 
     for my $id ( keys %{$seq_hash} ) {
-        my $seq = $seq_hash -> $id;
+        my $seq = $seq_hash -> {$id};
         $seq =~ s/\*$// if $seq =~ /\*$/;
         push @filter, $seq if $seq =~ /\*/;
     }
