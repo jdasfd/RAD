@@ -9,6 +9,7 @@
 # Change logs:
 # Version 1.0.0 23-07-05: The initial version.
 # Version 1.0.1 23-07-05: Bug fixes. Remove arg: --changestop. Default change id and stop codon.
+# Version 1.0.2 23-07-05: Add new module Array::Utils for intersect fuction and remove intersect sub.
 
 use strict;
 use warnings;
@@ -17,6 +18,7 @@ use Getopt::Long;
 use Path::Tiny;
 use Bio::Seq;
 use Bio::SeqIO;
+use Array::Utils qw(:all);
 use FindBin qw/$Bin/;
 use lib "$FindBin::Bin/lib/";
 use raid::MyFileIO;
@@ -93,7 +95,7 @@ while((my $seqobj = $seqIOobj -> next_seq())) {
 if ( defined $prestop && defined $length ) {
     my @fil_len = &filter_len(\%SEQUENCE, $length);
     my @fil_pre = &filter_pre_stop(\%SEQUENCE);
-    @filter_seq = &intersect(\@fil_len, \@fil_pre);
+    @filter_seq = intersect(@fil_len, @fil_pre);
 }
 elsif ( defined $prestop ) {
     @filter_seq = &filter_pre_stop(\%SEQUENCE);
@@ -151,19 +153,4 @@ sub filter_pre_stop {
     }
 
     return @filter;
-}
-
-# Usage: @inter = intersect(\@array1, \@array2);
-# return an intersect array list
-sub intersect {
-    my ($array_1, $array_2) = @_;
-    my @intersect;
-    my %inter;
-
-    foreach my $e ( @{$array_1}, @{$array_2} ) {
-        $inter{$e}++;
-    }
-    @intersect = keys %inter;
-
-    return @intersect;
 }
