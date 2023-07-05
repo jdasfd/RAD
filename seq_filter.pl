@@ -39,7 +39,7 @@ seq_filter.pl - discard unqualified sequences
     Options:
         --help          -h          brief help message
         --fasta         -f  STR     fasta file for quality control
-        --length        -l  NUM     remove seqs longer than this number (bp)
+        --longest       -l  NUM     remove seqs longer than this number (bp)
         --prestop                   remove seqs with premature stop codon
         --out           -o  STR     output file name, default: STDOUT
 
@@ -48,11 +48,11 @@ seq_filter.pl - discard unqualified sequences
 =cut
 
 GetOptions(
-    'help|h'     => sub {Getopt::Long::HelpMessage(0)},
-    'fasta|f=s'  => \(my $fasta_file),
-    'length|l=i' => \(my $length),
-    'prestop'    => \(my $prestop),
-    'out|o=s'    => \(my $out = 'stdout'),
+    'help|h'      => sub {Getopt::Long::HelpMessage(0)},
+    'fasta|f=s'   => \(my $fasta_file),
+    'longest|l=i' => \(my $length),
+    'prestop'     => \(my $prestop),
+    'out|o=s'     => \(my $out = 'stdout'),
 ) or Getopt::Long::HelpMessage(1);
 
 if ( !defined $fasta_file ) {
@@ -81,7 +81,7 @@ while((my $seqobj = $seqIOobj -> next_seq())) {
     my $seq = $seqobj -> seq();
     # modified ids and seqs here
     $id =~ s/:/_/g;
-    $seq =~ s/\.$/\*/ if $seq =~ /\.$/;
+    $seq =~ s/\./\*/g;
     $SEQUENCE{$id} = $seq;
 }
 
@@ -139,12 +139,15 @@ sub filter_len {
 # Usage: @filter = filter_pre_stop(\%SEQUENCE);
 # return an array including seq ids discarding premature stop codon
 sub filter_pre_stop {
-    my ($seq_hash) = $_;
+    my ($seq_hash) = @_;
     my @filter;
 
     for my $id ( keys %{$seq_hash} ) {
         my $seq = $seq_hash -> {$id};
-        push @filter, $seq unless $seq =~ /\*/;
+        $seq =~ s/\*$//;
+        unless ( $seq =~ /\*/ ) {
+            push @filter, $id;
+        }
     }
 
     return @filter;
