@@ -87,7 +87,7 @@ while((my $seqobj = $seqIOobj -> next_seq())) {
 if ( defined $changestop ) {
     for my $id ( keys %SEQUENCE ) {
         my $seq = $SEQUENCE{$id};
-        $seq =~ s/\.$/\*$/ if $seq =~ /\.$/;
+        $seq =~ s/\.$/\*/ if $seq =~ /\.$/;
         $SEQUENCE{$id} = $seq;
     }
 }
@@ -148,7 +148,7 @@ sub filter_pre_stop {
     for my $id ( keys %{$seq_hash} ) {
         my $seq = $seq_hash -> $id;
         $seq =~ s/\*$// if $seq =~ /\*$/;
-        push @filter, $seq if $seq =~ /*/;
+        push @filter, $seq if $seq =~ /\*/;
     }
 
     return @filter;
