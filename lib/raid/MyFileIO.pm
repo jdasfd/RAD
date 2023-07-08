@@ -12,6 +12,7 @@
 # Version 1.1.1 2023-06-25: Modified get_longest_trans codes.
 # Version 1.1.2 2023-06-26: Fixes bugs: skip empty lines and accept transcript annotation.
 # Version 1.2.0 2023-06-26: Add function print_out.
+# Version 1.2.1 2023-07-08: Modified read_pred, return nothing now. And skip the first empty line.
 
 =head1 NAME
 
@@ -86,8 +87,9 @@ sub getInputFilehandle
 
 =cut
 sub print_out{
-    my $out_fh;
     my ($print_array, $out) = @_;
+
+    my $out_fh;
 
     if ( lc($out) eq "stdout" ) {
         $out_fh = *STDOUT;
@@ -106,24 +108,26 @@ sub print_out{
 =head2 read_pred
 
     About : Reading sequences from tmbed result (.pred)
-    Usage : my @seq_id_list = read_pred(\%SEQs, $filename);
-     Args : Reference to a hash to hold all the sequences;
+    Usage : read_pred(\%INDEXs, $filename);
+     Args : Reference to a hash to hold all the indexes with id;
             Filename (.pred format);
-  Returns : Array of sequence IDs
+  Returns : Nothing
 
 =cut
 sub read_pred {
     my ($seq_hash, $in) = @_;
-    my @id_list;
 
     my $fh = getInputFilehandle($in);
-    my $fas = do { local $/; <$fh> };
+    my $file = do { local $/; <$fh> };
 
-    my @fas = split /\>/, $fas;
-    $fas[0] =~ s/^\>//;
+    my @fas = split /\>/, $file;
+    for (@fas) {
+        if ( $_ eq "" ) {
+            shift @fas;
+        }
+    }
 
-    for my $str (@fas)
-    {
+    for my $str (@fas) {
         $str =~ /^(.+?)\n/;
         my $id = $1;
 
@@ -156,10 +160,7 @@ sub read_pred {
                 $seq_hash -> {$id} = $tmindex;
             }
         }
-        # save id
-        push @id_list, $id;
     }
-    return (@id_list);
 }
 
 =head2 get_longest_trans
