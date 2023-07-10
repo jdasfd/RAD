@@ -174,7 +174,7 @@ sub read_pred {
 =cut
 sub get_longest_trans {
     my ($seq_hash, $in) = @_;
-    my %mRNAs_all;
+    my (%mRNAs_all, %CDS);
     my $fh = getInputFilehandle($in);
     while( <$fh> ) {
         next if (/^\#/ || /^\s+$/ || /^$/);
@@ -205,6 +205,15 @@ sub get_longest_trans {
                 $mRNAs_all{$parent} -> {represent} = $id;
                 $mRNAs_all{$parent} -> {length} = $length;
             }
+        }
+        elsif ( $feature =~ /CDS/ ) {
+            m{
+                \s+ID\=(.*?)\;.*
+                (Parent|Locus_id)\=(.*?)(;|$)
+            }x;
+
+            my ($id, $parent) = ($5, $7);
+            $CDS{$parent} = $id;
         }
     }
 
