@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
-# Version: 1.0.0
+# Version: 1.0.1
 #
 # Change logs:
 # Version 1.0.0 2023-06-08: Initial version. Add function codon_translate
@@ -26,13 +26,6 @@ use warnings;
 use autodie;
 
 =head1 METHODS
-
-=head2 ECD_convert
-
-=cut
-sub ECD_convert {
-    my @
-}
 
 =head2 codon_translate
 

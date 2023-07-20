@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
-# Version: 1.0.0
+# Version: 1.2.1
 #
 # Change logs:
 # Version 1.0.0 2023-06-08: Initial version. Add function getInputFilehandle, read_pred.
@@ -229,7 +229,7 @@ sub get_longest_trans {
 
 =head1 VERSION
 
-1.0.0
+1.2.1
 
 =head1 AUTHOR
 
