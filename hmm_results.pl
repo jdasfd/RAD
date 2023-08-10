@@ -8,6 +8,7 @@
 #
 # Change logs:
 # Version: 1.0.0 23-06-14: The initial version, move from the RLK_family repo.
+# Version: 1.0.1 23-08-10: Remove @empty_domain for not using it.
 
 use strict;
 use warnings;
@@ -61,7 +62,7 @@ elsif ( !path($input) -> is_file ) {
 # init
 #----------------------------------------------------------#
 
-my (@for_print, @empty_domain);
+my (@for_print);
 
 my $searchio = Bio::SearchIO -> new (
                                         -format     => 'hmmer',
