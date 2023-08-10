@@ -13,6 +13,7 @@
 # Version 1.1.2 2023-06-26: Fixes bugs: skip empty lines and accept transcript annotation.
 # Version 1.2.0 2023-06-26: Add function print_out.
 # Version 1.2.1 2023-07-08: Modified read_pred, return nothing now. And skip the first empty line.
+# Version 1.3.0 2023-08-10: Add function read_hmm.
 
 =head1 NAME
 
@@ -28,6 +29,7 @@ package raid::MyFileIO;
 
 use strict;
 use warnings;
+use Bio::SearchIO;
 
 =head1 METHODS
 
@@ -163,6 +165,41 @@ sub read_pred {
     }
 }
 
+=head2 read_hmm
+
+    About : Reading hmmscan result to a hash
+    Usage : my @for_print = read_hmm($in);
+     Args : Hmmscan result txt filename (.txt format);
+  Returns : @for_print;
+
+=cut
+sub read_hmm {
+    my ($in) = @_;
+    my @for_print;
+
+    my $searchio = Bio::SearchIO -> new (
+        -format     => 'hmmer',
+        -version    => 3,
+        -file       => $in,
+    );
+
+    while ( my $result = $searchio -> next_result() ) {
+        while ( my $hit = $result -> next_hit ) {
+            while ( my $hsp = $hit -> next_hsp ){
+                my $query = $result -> query_name;
+                my $hit_name = $hit -> name();
+                my $evalue = $hsp -> evalue();
+                my $start = $hsp -> start('query');
+                my $end = $hsp -> end('query');
+                my $for_print = "$query\t$hit_name\t$evalue\t$start\t$end";
+                push @for_print, $for_print;
+            }
+        }
+    }
+
+    return @for_print;
+}
+
 =head2 get_longest_trans
 
     About : Get the longest transcript as the representative transcript (NCBI format)
@@ -229,7 +266,7 @@ sub get_longest_trans {
 
 =head1 VERSION
 
-1.2.1
+1.3.0
 
 =head1 AUTHOR
 
