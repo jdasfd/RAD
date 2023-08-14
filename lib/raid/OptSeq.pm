@@ -1,22 +1,24 @@
 #!/usr/bin/env perl
 #
-# Convert.pm -- Multiple converting tools
+# OptSeq.pm -- Multiple sequences operation
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
 # Version: 1.0.1
 #
 # Change logs:
-# Version 1.0.0 2023-06-08: Initial version. Add function codon_translate
-# Version 1.0.1 2023-06-15: conda_translate could translate sequences now
+# Version 1.0.0 2023-06-08: Initial version. Add function codon_translate.
+# Version 1.0.1 2023-06-15: Codon_translate could translate sequences now.
+# Version 1.1.0 2023-08-13: Rename .pm to OptSeq.
+# Version 1.1.1 2023-08-14: Add function seq_some, seq_replace.
 
 =head1 NAME
 
-raid::Convert - Converting some results into the specific types
+raid::OptSeq - Converting some results into the specific types
 
 =head1 SYNOPSIS
 
-    use raid::Convert qw();
+    use raid::OptSeq qw();
 
 =cut
 
@@ -122,6 +124,51 @@ sub codon_translate {
     return $out_pep;
 }
 
+=head2 seq_some
+
+      About : Extracting sequences from sequence hash
+      Usage : my @for_print = seq_some(\%SEQUENCE, \@some_id);
+       Args : Hash with all sequence info;
+              id list for extracting sequences
+    Returns : printing format of sequences
+
+=cut
+sub seq_some {
+    my ($seq_hash_ref, $id_array_ref) = @_;
+    my @for_print;
+
+    for ( @{$id_array_ref} ) {
+        my $seq_id = $_;
+        my $seq = $seq_hash_ref -> {$seq_id};
+        push @for_print, $seq_id;
+        push @for_print, $seq;
+    }
+
+    return @for_print;
+}
+
+=head2 seq_replace
+
+      About : Replacing sequence names
+      Usage : my @for_print = seq_some(\%SEQUENCE, \@replace_id);
+       Args : Hash with all sequence info;
+              replacing array with element saved "old_name,new_name"
+    Returns : printing format of sequences
+
+=cut
+sub seq_replace {
+    my ($seq_hash_ref, $rep_array_ref) = @_;
+    my @for_print;
+
+    for ( @{$rep_array_ref} ) {
+        my ($old_id, $new_id) = split/,/, $_;
+        my $seq = $seq_hash_ref -> {$old_id};
+        push @for_print, $new_id;
+        push @for_print, $seq;
+    }
+
+    return @for_print;
+}
 
 1;
 

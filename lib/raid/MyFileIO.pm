@@ -13,7 +13,8 @@
 # Version 1.1.2 2023-06-26: Fixes bugs: skip empty lines and accept transcript annotation.
 # Version 1.2.0 2023-06-26: Add function print_out.
 # Version 1.2.1 2023-07-08: Modified read_pred, return nothing now. And skip the first empty line.
-# Version 1.3.0 2023-08-10: Add function read_hmm.
+# Version 1.3.0 2023-08-13: Add function read_hmm_txt.
+# Version 1.4.0 2023-08-13: Add function read_fasta. Remove get_longest_trans codes for changing.
 
 =head1 NAME
 
@@ -30,6 +31,8 @@ package raid::MyFileIO;
 use strict;
 use warnings;
 use Bio::SearchIO;
+use Bio::Seq;
+use Bio::SeqIO;
 
 =head1 METHODS
 
@@ -84,7 +87,7 @@ sub getInputFilehandle
     About : Output lines saved in the print array
     Usage : print_out(\@for_print, $out_file);
      Args : Reference to an array to hold all the content;
-            Output file (stdout or filename);
+            Output file (stdout or filename)
   Returns : None
 
 =cut
@@ -112,7 +115,7 @@ sub print_out{
     About : Reading sequences from tmbed result (.pred)
     Usage : read_pred(\%INDEXs, $filename);
      Args : Reference to a hash to hold all the indexes with id;
-            Filename (.pred format);
+            Filename (.pred format)
   Returns : Nothing
 
 =cut
@@ -165,15 +168,15 @@ sub read_pred {
     }
 }
 
-=head2 read_hmm
+=head2 read_hmm_txt
 
-    About : Reading hmmscan result to a hash
-    Usage : my @for_print = read_hmm($in);
-     Args : Hmmscan result txt filename (.txt format);
-  Returns : @for_print;
+    About : Reading hmmscan result via Bio::SearchIO to tsv format
+    Usage : my @for_print = read_hmm_txt($in);
+     Args : Hmmscan result txt filename (.txt format)
+  Returns : @for_print (each element contains an array string in tsv format)
 
 =cut
-sub read_hmm {
+sub read_hmm_txt {
     my ($in) = @_;
     my @for_print;
 
@@ -200,66 +203,32 @@ sub read_hmm {
     return @for_print;
 }
 
-=head2 get_longest_trans
+=head2 read_fasta
 
-    About : Get the longest transcript as the representative transcript (NCBI format)
-    Usage : get_longest_trans(\%LONGEST_TRANS, $gff_file);
-     Args : Reference to a hash to contain all longest trans;
-            gff filename (.gff3 format);
-  Returns : longest transcripts hash [key: transcript id -> value: mRNA parent id]
+    About : Reading fasta via Bio::SeqIO
+    Usage : my @ID = read_fasta(\%SEQUENCE, $in);
+     Args : Hash reference for saving sequences;
+            fasta filename
+  Returns : @ID saved all sequence IDs
 
 =cut
-sub get_longest_trans {
-    my ($seq_hash, $in) = @_;
-    my (%mRNAs_all, %CDS);
-    my $fh = getInputFilehandle($in);
-    while( <$fh> ) {
-        next if (/^\#/ || /^\s+$/ || /^$/);
-        chomp;
-        my ($feature, $start, $end) = (split /\t/)[2,3,4];
+sub read_fasta {
+    my ( $hash_ref, $in ) = @_;
+    my @id;
 
-        if ( $feature =~ /(mRNA|pseudogenic\_transcript|transcript)/ ) {
-            m{
-                ^(.*?)\s+.*?                   # Chromosome ID
-                \s+(\d+)                       # Start Position
-                \s+(\d+)\s+.*                  # End Position
-                \s+(\-|\+)\s+\.                # Strand
-                \s+ID\=(.*?)\;.*               # ID
-                (Parent|Locus_id)\=(.*?)(;|$)  # Parent
-            }x;
+    my $seqIOobj = Bio::SeqIO -> new (
+        -file       =>  "$in",
+        '-format'   =>  'Fasta'
+    );
 
-            my ($id, $parent) = ($5, $7);
-
-            my $length = $end - $start + 1;
-
-            if ( $mRNAs_all{$parent} -> {represent} ) {
-                if ($mRNAs_all{$parent} -> {length} < $length) {
-                    $mRNAs_all{$parent} -> {represent} = $id;
-                    $mRNAs_all{$parent} -> {length} = $length;
-                }
-            }
-            else {
-                $mRNAs_all{$parent} -> {represent} = $id;
-                $mRNAs_all{$parent} -> {length} = $length;
-            }
-        }
-        elsif ( $feature =~ /CDS/ ) {
-            m{
-                \s+ID\=(.*?)\;.*
-                (Parent|Locus_id)\=(.*?)(;|$)
-            }x;
-
-            my ($id, $parent) = ($5, $7);
-            $CDS{$parent} = $id;
-        }
+    while (( my $seqobj = $seqIOobj -> next_seq() )) {
+        my $id = $seqobj -> id();
+        my $seq = $seqobj -> seq();
+        $hash_ref -> {$id} = $seq;
+        push @id, $id;
     }
 
-    for my $mRNA (keys %mRNAs_all)
-    {
-        my $represent_id = $mRNAs_all{$mRNA} -> {represent};
-
-        $seq_hash -> {$represent_id} = $mRNA;
-    }
+    return @id;
 }
 
 1;
