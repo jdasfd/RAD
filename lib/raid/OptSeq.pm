@@ -4,13 +4,14 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
-# Version: 1.0.1
+# Version: 1.2.0
 #
 # Change logs:
 # Version 1.0.0 2023-06-08: Initial version. Add function codon_translate.
 # Version 1.0.1 2023-06-15: Codon_translate could translate sequences now.
 # Version 1.1.0 2023-08-13: Rename .pm to OptSeq.
 # Version 1.1.1 2023-08-14: Add function seq_some, seq_replace.
+# Version 1.2.0 2023-08-14: Add function seq_trunc.
 
 =head1 NAME
 
@@ -22,7 +23,7 @@ raid::OptSeq - Converting some results into the specific types
 
 =cut
 
-package raid::Convert;
+package raid::OptSeq;
 use strict;
 use warnings;
 use autodie;
@@ -31,10 +32,10 @@ use autodie;
 
 =head2 codon_translate
 
-      About : Tranlating CDS to proteins
+      About : Tranlating CDS to proteins.
       Usage : my $pep_seq = codon_translate($dna_seq)
-       Args : codon translator
-    Returns : pep sequences
+       Args : Codon translator.
+    Returns : Pep sequences.
 
 =cut
 sub codon_translate {
@@ -126,11 +127,11 @@ sub codon_translate {
 
 =head2 seq_some
 
-      About : Extracting sequences from sequence hash
+      About : Extracting sequences from sequence hash.
       Usage : my @for_print = seq_some(\%SEQUENCE, \@some_id);
-       Args : Hash with all sequence info;
-              id list for extracting sequences
-    Returns : printing format of sequences
+       Args : Hash with all sequences;
+              id list for extracting sequences.
+    Returns : Printing format of sequences.
 
 =cut
 sub seq_some {
@@ -149,11 +150,11 @@ sub seq_some {
 
 =head2 seq_replace
 
-      About : Replacing sequence names
+      About : Replacing sequence names.
       Usage : my @for_print = seq_some(\%SEQUENCE, \@replace_id);
-       Args : Hash with all sequence info;
-              replacing array with element saved "old_name,new_name"
-    Returns : printing format of sequences
+       Args : Hash with all sequences;
+              replacing array with element saved "old_name,new_name".
+    Returns : Printing format of sequences.
 
 =cut
 sub seq_replace {
@@ -170,11 +171,34 @@ sub seq_replace {
     return @for_print;
 }
 
+=head2 seq_trunc
+
+      About : Truncating sequences according to domain info.
+      Usage : my @for_print = seq_trunc(\%SEQUENCE, \%SEQ_INFO, \@id);
+       Args : Hash with all sequences;
+              hash with all domain info;
+              array saved all id.
+    Returns : Printing format of sequences.
+
+=cut
+sub seq_trunc {
+    my ($seq_ref, $seqinfo_ref, $id_ref) = @_;
+    my @for_print;
+
+    for ( @{$id_ref} ) {
+        my $id = $_;
+        my $seqinfo = $seqinfo_ref -> {$id};
+        my ($start, $stop);
+    }
+
+    return @for_print;
+}
+
 1;
 
 =head1 VERSION
 
-1.0.1
+1.2.0
 
 =head1 AUTHOR
 
