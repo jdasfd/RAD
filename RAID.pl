@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-08-10
-# Version: 1.0.0
+# Version: 1.1.0
 #
 # Change logs:
 # Version 1.0.0 2023-08-10: The initial version. Realize automatically RLK scanning from a protein fasta file.
@@ -401,7 +401,7 @@ sub COUNT_SUB_STR {
 
 =head1 VERSION
 
-1.0.0
+1.1.0
 
 =head1 AUTHORS
 

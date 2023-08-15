@@ -4,10 +4,10 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
-# Version: 1.0.0
+# Version: 1.2.0
 #
 # Change logs:
-# Version 1.0.0 06/08/23: The initial version.
+# Version 1.0.0 23-06-08: The initial version.
 # Version 1.0.1 23-06-21: Updated get_represent_trans sub.
 # Version 1.0.2 23-06-21: Move get_represent_trans to perl module MyFileIO.
 # Version 1.1.0 23-06-25: Realize longest transcripts function and move them into perl module MyFileIO.
