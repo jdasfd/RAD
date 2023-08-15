@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
-# Version: 1.2.0
+# Version: 1.2.1
 #
 # Change logs:
 # Version 1.0.0 2023-06-08: Initial version. Add function codon_translate.
@@ -12,6 +12,7 @@
 # Version 1.1.0 2023-08-13: Rename .pm to OptSeq.
 # Version 1.1.1 2023-08-14: Add function seq_some, seq_replace.
 # Version 1.2.0 2023-08-14: Add function seq_trunc.
+# Version 1.2.1 2023-08-15: Bug fixes for fasta output without > as id start.
 
 =head1 NAME
 
@@ -139,9 +140,8 @@ sub seq_some {
     my @for_print;
 
     for ( @{$id_array_ref} ) {
-        my $seq_id = $_;
-        my $seq = $seq_hash_ref -> {$seq_id};
-        push @for_print, $seq_id;
+        my $seq = $seq_hash_ref -> {$_};
+        push @for_print, ">$_";
         push @for_print, $seq;
     }
 
@@ -198,7 +198,7 @@ sub seq_trunc {
 
 =head1 VERSION
 
-1.2.0
+1.2.1
 
 =head1 AUTHOR
 

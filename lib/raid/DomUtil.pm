@@ -4,11 +4,12 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-07-20
-# Version: 1.0.0
+# Version: 1.2.0
 #
 # Change logs:
 # Version 1.0.0 2023-07-20: Initial version. Add function domain_unified but need updating.
 # Version 1.1.0 2023-08-13: Add function domain_sort.
+# Version 1.2.0 2023-08-15: Add function domain_filter.
 
 =head1 NAME
 
@@ -68,11 +69,53 @@ sub domain_sort {
     }
 }
 
+=head2 domain_filter
+
+      About : Filter all sorted domains according to their positions.
+      Usage : domain_filter();
+       Args : Hash saved all domain info, sort with e-value from less to more.
+    Returns : Nothing.
+
+=cut
+sub domain_filter {
+    my ($domain_hash) = @_;
+
+    for my $gene_id ( keys %{$domain_hash} ) {
+        my $domain_array_ref = $domain_hash -> {$gene_id};
+        my $domain_set = AlignDB::IntSpan -> new;
+        my @new_domain_list;
+
+        for ( @{$domain_array_ref} ) {
+            my $record = $_;
+            my ($start, $end) = (split /,/, $_) [2,3];
+            if ( $domain_set -> is_empty ) {
+                $domain_set -> add_range($start, $end);
+                push @new_domain_list, $record;
+            }
+            else {
+                my $test_set = AlignDB::IntSpan -> new;
+                $test_set -> add_range($start, $end);
+                my $result = $domain_set -> intersect($test_set);
+                if ( $result -> is_empty ) {
+                    $domain_set -> add_range($start, $end);
+                    push @new_domain_list, $record;
+                }
+                else {
+                    next;
+                }
+            }
+        }
+
+        @{$domain_array_ref} = @new_domain_list;
+        $domain_hash -> {$gene_id} = $domain_array_ref;
+    }
+}
+
 1;
 
 =head1 VERSION
 
-1.1.0
+1.2.0
 
 =head1 AUTHOR
 

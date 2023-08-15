@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
-# Version: 1.2.1
+# Version: 1.5.0
 #
 # Change logs:
 # Version 1.0.0 2023-06-08: Initial version. Add function getInputFilehandle, read_pred.
@@ -15,6 +15,7 @@
 # Version 1.2.1 2023-07-08: Modified read_pred, return nothing now. And skip the first empty line.
 # Version 1.3.0 2023-08-13: Add function read_hmm_txt.
 # Version 1.4.0 2023-08-13: Add function read_fasta. Remove get_longest_trans codes for changing.
+# Version 1.5.0 2023-08-15: Add function extract_pred_info.
 
 =head1 NAME
 
@@ -33,15 +34,16 @@ use warnings;
 use Bio::SearchIO;
 use Bio::Seq;
 use Bio::SeqIO;
+use AlignDB::IntSpan;
 
 =head1 METHODS
 
 =head2 getInputFilehandle
 
-      About : Open and return filehandles
+      About : Open and return filehandles.
       Usage : my $fh = getInputFilehandle($filename);
-       Args : Filename
-    Returns : Filehandle to the opened file
+       Args : Filename.
+    Returns : Filehandle to the opened file.
 
 =cut
 sub getInputFilehandle
@@ -84,11 +86,11 @@ sub getInputFilehandle
 
 =head2 print_out
 
-    About : Output lines saved in the print array
+    About : Output lines saved in the print array.
     Usage : print_out(\@for_print, $out_file);
      Args : Reference to an array to hold all the content;
-            Output file (stdout or filename)
-  Returns : None
+            Output file (stdout or filename).
+  Returns : None.
 
 =cut
 sub print_out{
@@ -112,11 +114,11 @@ sub print_out{
 
 =head2 read_pred
 
-    About : Reading sequences from tmbed result (.pred)
+    About : Reading sequences from tmbed result (.pred).
     Usage : read_pred(\%INDEXs, $filename);
      Args : Reference to a hash to hold all the indexes with id;
-            Filename (.pred format)
-  Returns : Nothing
+            Filename (.pred format).
+  Returns : Nothing.
 
 =cut
 sub read_pred {
@@ -163,6 +165,78 @@ sub read_pred {
         unless ( $len_seq != $len_tm ) {
             if ( ref($seq_hash) eq 'HASH' ) {
                 $seq_hash -> {$id} = $tmindex;
+            }
+        }
+    }
+}
+
+=head2 extract_pred_info
+
+    About : Extracting pred info and add them to hash of domains.
+    Usage : read_pred(\%DOMAIN_info, \%INDEXs);
+     Args : Reference to a hash to hold all domains with id;
+            Refrence to a hash contains read_pred result.
+  Returns : Nothing (thinsg will add to original hash).
+
+=cut
+sub extract_pred_info {
+    my ($domain_ref, $index_ref) = @_;
+
+    for my $id (keys %{$index_ref}) {
+        my $sp_set = AlignDB::IntSpan -> new;
+        my $tmd_o2i = AlignDB::IntSpan -> new;
+        my $tmd_i2o = AlignDB::IntSpan -> new;
+
+        my $index = $index_ref -> {$id};
+        my $length = length($index);
+
+        for ( my $n = 0; $n < $length; $n++ ) {
+            my $pos = $n+1;
+            my $char = substr $index, $n, 1;
+            if ( $char =~ /S/ ) {
+                $sp_set -> add ($pos);
+            }
+            elsif ( $char =~  /[h|b]/ ) {
+                $tmd_o2i -> add ($pos);
+            }
+            elsif ( $char =~ /[H|B]/ ) {
+                $tmd_i2o -> add ($pos);
+            }
+        }
+
+        unless ( $sp_set -> is_empty ) {
+            my $run = $sp_set -> runlist;
+            my @range = split/,/, $run;
+            for (@range) {
+                $_ =~ /(\d+)-(\d+)/;
+                my $string = "Sig_Pep,0,$1,$2";
+                my $array_ref = $domain_ref -> {$id};
+                push @{$array_ref}, $string;
+                $domain_ref -> {$id} = $array_ref;
+            }
+        }
+
+        unless ( $tmd_o2i -> is_empty ) {
+            my $run = $tmd_o2i -> runlist;
+            my @range = split/,/, $run;
+            for (@range) {
+                $_ =~ /(\d+)-(\d+)/;
+                my $string = "TMD_o2i,0,$1,$2";
+                my $array_ref = $domain_ref -> {$id};
+                push @{$array_ref}, $string;
+                $domain_ref -> {$id} = $array_ref;
+            }
+        }
+
+        unless ( $tmd_i2o -> is_empty) {
+            my $run = $tmd_i2o -> runlist;
+            my @range = split/,/, $run;
+            for (@range) {
+                $_ =~ /(\d+)-(\d+)/;
+                my $string = "TMD_i2o,0,$1,$2";
+                my $array_ref = $domain_ref -> {$id};
+                push @{$array_ref}, $string;
+                $domain_ref -> {$id} = $array_ref;
             }
         }
     }
@@ -235,7 +309,7 @@ sub read_fasta {
 
 =head1 VERSION
 
-1.3.0
+1.5.0
 
 =head1 AUTHOR
 
