@@ -4,18 +4,20 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-08-10
-# Version: 1.1.0
+# Version: 1.1.1
 #
 # Change logs:
 # Version 1.0.0 2023-08-10: The initial version. Realize automatically RLK scanning from a protein fasta file.
 # Version 1.1.0 2023-08-15: All tested in my own environment and run successfully. Remove repeated modules.
+# Version 1.1.1 2023-08-17: Resolve log cannot redirect to the specified output.
+#                           Remove File::Basename for not using it.
+#                           Create output dir.
 
 
 use strict;
 use warnings;
 
 use Getopt::Long;
-use File::Basename;
 use Path::Tiny;
 use List::Util qw(uniq);
 use IO::Tee;
@@ -85,7 +87,10 @@ if ( !defined $outdir ) {
     $outdir = $current."/result";
 }
 else {
-    $outdir =~ s/\/$//;
+    if ( $outdir =~ /\/$/ ) {
+        $outdir =~ s/\/$//;
+    }
+    path ($outdir) -> mkdir;
 }
 
 
@@ -97,8 +102,8 @@ else {
 my $defaulte = Math::BigFloat -> new('1e-10');
 my $i = 0;
 my $gene_name;
-my $tee_new = IO::Tee -> new ( "> log.txt", \*STDERR );
-my $tee_add = IO::Tee -> new ( ">> log.txt", \*STDERR );
+my $tee_new = IO::Tee -> new ( "> $outdir/log.txt", \*STDERR );
+my $tee_add = IO::Tee -> new ( ">> $outdir/log.txt", \*STDERR );
 my (%DOMAIN_info, %SEQUENCE, %TM_info, %RLK);
 my @PKD = ("Pkinase", "PK_Tyr_Ser-Thr", "Pkinase_fungal", "Pkinase_C");
 my (@query_with_pkd, @write_hmm_tsv, @final_domain_tsv, @rlk_out_tsv);
@@ -401,7 +406,7 @@ sub COUNT_SUB_STR {
 
 =head1 VERSION
 
-1.1.0
+1.1.1
 
 =head1 AUTHORS
 
