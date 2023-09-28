@@ -332,8 +332,8 @@ for my $keys (keys %RLK) {
             }
         }
         elsif ($domain_list =~ /TMD_i2o/) {
-            my $outline = "$keys\tRLK_reverse\tNone\t$KD_count";
-            push @rlk_out_tsv, $outline;
+            my $outline = "$keys\tRLK_reverse\tUnknown\t$KD_count";
+            push @other_rlk_out_tsv, $outline;
         }
         else {
             my $outline = "$keys\tRLK_WE\tNone\t$KD_count";
