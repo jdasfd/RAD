@@ -12,7 +12,9 @@
 # Version 1.1.1 2023-08-17: Resolve log cannot redirect to the specified output.
 #                           Remove File::Basename for not using it.
 #                           Create output dir.
-
+# Version 1.2.0 2023-09-28: Judge different kinases - will judge the first kinase after the first TMD.
+#                           Log will add system time and will not replaced old log.
+#                           RLK judgement standard change, modified code of RLK scanning part.
 
 use strict;
 use warnings;
@@ -40,7 +42,7 @@ RAID.pl -- RLK Auto-IDentifier
 
 =head1 SYNOPSIS
 
-    RAID.pl (v1.0.0)
+    RAID.pl (v1.2.0)
         RLK Automatical IDentifier searching RLKs among protein.fa files.
 
     Usage:
@@ -93,6 +95,10 @@ else {
     path ($outdir) -> mkdir;
 }
 
+unless ( path("$outdir/log.txt") -> is_file ) {
+    path("$outdir/log.txt") -> touch;
+}
+
 
 #----------------------------------------------------------#
 # Prep
@@ -102,16 +108,19 @@ else {
 my $defaulte = Math::BigFloat -> new('1e-10');
 my $i = 0;
 my $gene_name;
-my $tee_new = IO::Tee -> new ( "> $outdir/log.txt", \*STDERR );
 my $tee_add = IO::Tee -> new ( ">> $outdir/log.txt", \*STDERR );
 my (%DOMAIN_info, %SEQUENCE, %TM_info, %RLK);
 my @PKD = ("Pkinase", "PK_Tyr_Ser-Thr", "Pkinase_fungal", "Pkinase_C");
-my (@query_with_pkd, @write_hmm_tsv, @final_domain_tsv, @rlk_out_tsv);
+my (@query_with_pkd, @write_hmm_tsv, @final_domain_tsv, @rlk_out_tsv, @other_rlk_out_tsv);
 
 # sequence read to hash
+# start information record to log
 my @all_seq_id = raid::MyFileIO::read_fasta(\%SEQUENCE, $input);
 my $all_seq_num = @all_seq_id;
-print $tee_new "Start to scan $all_seq_num proteins inside the fasta file!\n";
+print $tee_add "Start to scan $all_seq_num proteins inside the fasta file!\n";
+print $tee_add "Input: $input.\n";
+my $time = localtime;
+print $tee_add "Start at $time.\n";
 print $tee_add "\n";
 
 # all output path
@@ -122,6 +131,7 @@ my $kd_seq = $outdir."/Pro.KD.fa";
 my $tmbed_pred = $outdir."/Pro.KD.pred";
 my $domain_final = $outdir."/Pro.final.domain.tsv";
 my $rlk_output = $outdir."/RLK.tsv";
+my $other_rlk_output = $outdir."/RLK.others.tsv";
 
 
 #----------------------------------------------------------#
@@ -303,75 +313,45 @@ while ( <$final_in> ) {
 
 my $domain_list;
 # define and check domain structure
-for my $keys (keys %RLK){
-    $domain_list = join ( "#", @{$RLK{$keys}} );
-    my $KD_count = &COUNT_SUB_STR ("Kinase", $domain_list);
-    if ( $domain_list =~ /TMD_o2i/ ) {
-        if ( $KD_count == 1 ) {
-            if ( $domain_list =~ /^(.+)TMD_o2i.+?Kinase.*$/ ) {
-                my $ECD_all = $1;
-                $ECD_all =~ s/TMD_.+?#//g;
-                $ECD_all =~ s/^Sig_Pep#//g;
-                if ( $ECD_all =~ /(?![TMD_o2i#|Sig_Pep#])/ && $ECD_all ne "" ) {
-                    my $outline = "$keys\tRLK\t$ECD_all\t$KD_count";
-                    push @rlk_out_tsv, $outline;
-                }
-                else {
-                    my $outline = "$keys\tRLK_WE\tNone\t$KD_count";
-                    push @rlk_out_tsv, $outline;
-                }
+for my $keys (keys %RLK) {
+    $domain_list = join("#", @{$RLK{$keys}});
+    my $KD_count = &COUNT_SUB_STR("Kinase", $domain_list);
+    my $TMD_count = &COUNT_SUB_STR("TMD_", $domain_list);
+    unless ($TMD_count == 0 || $TMD_count >= 2) {
+        if ($domain_list =~ /^(.+)TMD_o2i.+?Kinase.*$/) {
+            my $ECD_all = $1;
+            $ECD_all =~ s/^Sig_Pep#//g;
+            $ECD_all =~ s/#/-/g;
+            if ($ECD_all =~ /(?![TMD_o2i#|Sig_Pep#])/ && $ECD_all ne "") {
+                my $outline = "$keys\tRLK\t$ECD_all\t$KD_count";
+                push @rlk_out_tsv, $outline;
             }
             else {
                 my $outline = "$keys\tRLK_WE\tNone\t$KD_count";
-                push @rlk_out_tsv, $outline
+                push @rlk_out_tsv, $outline;
             }
         }
+        elsif ($domain_list =~ /TMD_i2o/) {
+            my $outline = "$keys\tRLK_reverse\tNone\t$KD_count";
+            push @rlk_out_tsv, $outline;
+        }
         else {
-            my @KDSPLIT = split/Kinase#/, $domain_list;
-            my @ECDSPLIT;
-            for my $part (@KDSPLIT) {
-                if ( $part =~ /^(.+)TMD_o2i#.*/ ) {
-                    my $ECD_all = $1;
-                    $ECD_all =~ s/TMD_.+?#//g;
-                    $ECD_all =~ s/^Sig_Pep#//g;
-                    if ( $ECD_all =~ /(?![TMD_o2i#|Sig_Pep#])/ && $ECD_all ne "" ) {
-                        push @ECDSPLIT, $ECD_all;
-                    }
-                    else {
-                        next;
-                    }
-                }
-                else {
-                    next;
-                }
-            }
-            if ( @ECDSPLIT ) {
-                my $ECD_list = join ( ",", @ECDSPLIT );
-                my $outline = "$keys\tRLK\t$ECD_list\t$KD_count";
-                push @rlk_out_tsv, $outline;
-            }
-            else {
-                my $outline = "$keys\tRLK_WE\tNone\t$KD_count";
-                push @rlk_out_tsv, $outline;
-            }
+            my $outline = "$keys\tRLK_WE\tNone\t$KD_count";
+            push @rlk_out_tsv, $outline;
         }
     }
     else {
-        if ( $domain_list =~ /Sig_Pep/ ) {
-            my $outline = "$keys\tRLCK_SP\tNone\t$KD_count";
-            push @rlk_out_tsv, $outline;
-        }
-        else{
-            my $outline = "$keys\tRLCK\tNone\t$KD_count";
-            push @rlk_out_tsv, $outline;
-        }
+        my $outline = "$keys\tOthers\tUnknown\t$KD_count";
+        push @other_rlk_out_tsv, $outline;
     }
 }
 
 raid::MyFileIO::print_out(\@rlk_out_tsv, $rlk_output);
+raid::MyFileIO::print_out(\@other_rlk_out_tsv, $other_rlk_output);
 
 print $tee_add "\n";
 print $tee_add "==> Finished!\n";
+print $tee_add "\n";
 
 #----------------------------------------------------------#
 # Sub program
@@ -406,7 +386,7 @@ sub COUNT_SUB_STR {
 
 =head1 VERSION
 
-1.1.1
+1.2.0
 
 =head1 AUTHORS
 

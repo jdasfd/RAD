@@ -175,7 +175,7 @@ sub read_pred {
     About : Extracting pred info and add them to hash of domains.
     Usage : read_pred(\%DOMAIN_info, \%INDEXs);
      Args : Reference to a hash to hold all domains with id;
-            Refrence to a hash contains read_pred result.
+            Reference to a hash contains read_pred result.
   Returns : Nothing (thinsg will add to original hash).
 
 =cut
@@ -228,7 +228,7 @@ sub extract_pred_info {
             }
         }
 
-        unless ( $tmd_i2o -> is_empty) {
+        unless ( $tmd_i2o -> is_empty ) {
             my $run = $tmd_i2o -> runlist;
             my @range = split/,/, $run;
             for (@range) {
