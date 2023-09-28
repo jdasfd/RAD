@@ -321,7 +321,9 @@ for my $keys (keys %RLK) {
     unless ($TMD_count == 0 || $TMD_count >= 2) {
         if ($domain_list =~ /^(.+)TMD_o2i.+?Kinase.*$/) {
             my $ECD_all = $1;
-            $ECD_all =~ s/^Sig_Pep#//g and s/#$// and s/#/-/g;
+            $ECD_all =~ s/^Sig_Pep#//g;
+            $ECD_all =~ s/#$//;
+            $ECD_all =~ s/#/-/g;
             if ($ECD_all =~ /(?![TMD_o2i#|Sig_Pep#])/ && $ECD_all ne "") {
                 my $outline = "$keys\tRLK\t$ECD_all\t$KD_count";
                 push @rlk_out_tsv, $outline;
