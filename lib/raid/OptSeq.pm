@@ -11,7 +11,7 @@
 # Version 1.0.1 2023-06-15: Codon_translate could translate sequences now.
 # Version 1.1.0 2023-08-13: Rename .pm to OptSeq.
 # Version 1.1.1 2023-08-14: Add function seq_some, seq_replace.
-# Version 1.2.0 2023-08-14: Add function seq_trunc.
+# Version 1.2.0 2023-08-14: Add function seq_trunc, but not finished yet.
 # Version 1.2.1 2023-08-15: Bug fixes for fasta output without > as id start.
 
 =head1 NAME

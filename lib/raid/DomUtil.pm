@@ -4,12 +4,13 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-07-20
-# Version: 1.2.0
+# Version: 1.3.0
 #
 # Change logs:
 # Version 1.0.0 2023-07-20: Initial version. Add function domain_unified but need updating.
 # Version 1.1.0 2023-08-13: Add function domain_sort.
 # Version 1.2.0 2023-08-15: Add function domain_filter.
+# Version 1.3.0 2023-09-28: Remove function domain_unified.
 
 =head1 NAME
 
@@ -30,24 +31,15 @@ use Sort::Array qw (Sort_Table);
 
 =head1 METHODS
 
-=head2 domain_unified
-
-      About : Converting different domains into unified names
-      Usage : my $unified_name = domain_unified($ECD_name);
-       Args : codon translator
-    Returns : domain name unified
-
-=cut
-sub ECD_convert {
-    my $ECD = @_;
-}
-
 =head2 domain_sort
 
       About : Sort domains
       Usage : domain_sort(\%DOMAIN, $all_col, $sorted_col, $sep);
-       Args : hash saved all domain info, sort inside value
-    Returns : Nothing
+       Args : hash saved all domain info;
+              all cols count;
+              the col for sorted;
+              separater.
+    Returns : Nothing, but %DOMAIN will be sorted.
 
 =cut
 sub domain_sort {
@@ -71,10 +63,11 @@ sub domain_sort {
 
 =head2 domain_filter
 
-      About : Filter all sorted domains according to their positions.
-      Usage : domain_filter();
-       Args : Hash saved all domain info, sort with e-value from less to more.
-    Returns : Nothing.
+      About : Keep domains with smaller e-value
+              and remove domains with overlapping region.
+      Usage : domain_filter(\%DOMAIN);
+       Args : Hash saved all domain info, sort by e-value from less to more.
+    Returns : Nothing, but the %DOMAIN will be reduced.
 
 =cut
 sub domain_filter {
@@ -115,7 +108,7 @@ sub domain_filter {
 
 =head1 VERSION
 
-1.2.0
+1.3.0
 
 =head1 AUTHOR
 
