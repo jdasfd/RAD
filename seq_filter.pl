@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-07-05
-# Version: 1.0.0
+# Version: 1.0.2
 #
 # Change logs:
 # Version 1.0.0 23-07-05: The initial version.
