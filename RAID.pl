@@ -318,7 +318,7 @@ my $domain_list;
 for my $keys (keys %RLK) {
     $domain_list = join("#", @{$RLK{$keys}});
     my $KD_count = &COUNT_SUB_STR("Kinase", $domain_list);
-    if ( /TMD_/ ) {
+    if ( $domain_list =~ /TMD_/ ) {
         if ($domain_list =~ /^(.+?)TMD_o2i.+?Kinase.*$/) {
             my $ECD_all = $1;
             $ECD_all =~ s/^Sig_Pep#//g;
