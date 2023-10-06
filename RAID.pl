@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-08-10
-# Version: 1.1.1
+# Version: 1.2.2
 #
 # Change logs:
 # Version 1.0.0 2023-08-10: The initial version. Realize automatically RLK scanning from a protein fasta file.
@@ -16,6 +16,7 @@
 #                           Log will add system time and will not replaced old log.
 #                           RLK judgement standard change, modified code of RLK scanning part.
 # Version 1.2.1 2023-09-28: RLK number counting added to log. ECD output modified (remove the last -)
+# Version 1.2.2 2023-10-06: More TMD RLKs would not be removed.
 
 use strict;
 use warnings;
@@ -43,7 +44,7 @@ RAID.pl -- RLK Auto-IDentifier
 
 =head1 SYNOPSIS
 
-    RAID.pl (v1.2.1)
+    RAID.pl (version 1.2.2)
         RLK Automatical IDentifier searching RLKs among protein.fa files.
 
     Usage:
@@ -317,9 +318,8 @@ my $domain_list;
 for my $keys (keys %RLK) {
     $domain_list = join("#", @{$RLK{$keys}});
     my $KD_count = &COUNT_SUB_STR("Kinase", $domain_list);
-    my $TMD_count = &COUNT_SUB_STR("TMD_", $domain_list);
-    unless ($TMD_count == 0 || $TMD_count >= 2) {
-        if ($domain_list =~ /^(.+)TMD_o2i.+?Kinase.*$/) {
+    if ( /TMD_/ ) {
+        if ($domain_list =~ /^(.+?)TMD_o2i.+?Kinase.*$/) {
             my $ECD_all = $1;
             $ECD_all =~ s/^Sig_Pep#//g;
             $ECD_all =~ s/#$//;
@@ -390,7 +390,7 @@ sub COUNT_SUB_STR {
 
 =head1 VERSION
 
-1.2.1
+1.2.2
 
 =head1 AUTHORS
 
