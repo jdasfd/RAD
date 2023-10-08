@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-08-10
-# Version: 1.2.3
+# Version: 1.2.4
 #
 # Change logs:
 # Version 1.0.0 2023-08-10: The initial version. Realize automatically RLK scanning from a protein fasta file.
@@ -18,6 +18,7 @@
 # Version 1.2.1 2023-09-28: RLK number counting added to log. ECD output modified (remove the last -)
 # Version 1.2.2 2023-10-06: More TMD RLKs would not be removed.
 # Version 1.2.3 2023-10-07: Bug fixes: TMD_i2o would be treated as ECD in some cases.
+# Version 1.2.4 2023-10-08: All ECD were unified to None for better viewing. Add headline to RLK.others.tsv.
 
 use strict;
 use warnings;
@@ -45,7 +46,7 @@ RAID.pl -- RLK Auto-IDentifier
 
 =head1 SYNOPSIS
 
-    RAID.pl (version 1.2.3)
+    RAID.pl (version 1.2.4)
         RLK Automatical IDentifier searching RLKs among protein.fa files.
 
     Usage:
@@ -303,6 +304,7 @@ raid::MyFileIO::print_out(\@final_domain_tsv, $domain_final);
 
 my $headline = "Name\tType\tECD\tKD_count";
 push @rlk_out_tsv, $headline;
+push @other_rlk_out_tsv, $headline;
 print $tee_add "\n";
 print $tee_add "==> Scanning RLKs.\n";
 
@@ -335,7 +337,7 @@ for my $keys (keys %RLK) {
             }
         }
         elsif ($domain_list =~ /TMD_i2o/) {
-            my $outline = "$keys\tRLK_reverse\tUnknown\t$KD_count";
+            my $outline = "$keys\tRLK_reverse\tNone\t$KD_count";
             push @other_rlk_out_tsv, $outline;
         }
         else {
@@ -344,7 +346,7 @@ for my $keys (keys %RLK) {
         }
     }
     else {
-        my $outline = "$keys\tOthers\tUnknown\t$KD_count";
+        my $outline = "$keys\tOthers\tNone\t$KD_count";
         push @other_rlk_out_tsv, $outline;
     }
 }
@@ -391,7 +393,7 @@ sub COUNT_SUB_STR {
 
 =head1 VERSION
 
-1.2.3
+1.2.4
 
 =head1 AUTHORS
 
