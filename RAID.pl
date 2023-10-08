@@ -19,6 +19,7 @@
 # Version 1.2.2 2023-10-06: More TMD RLKs would not be removed.
 # Version 1.2.3 2023-10-07: Bug fixes: TMD_i2o would be treated as ECD in some cases.
 # Version 1.2.4 2023-10-08: All ECD were unified to None for better viewing. Add headline to RLK.others.tsv.
+#                           Bug fixes: RLK numbers count without headline.
 
 use strict;
 use warnings;
@@ -355,6 +356,7 @@ raid::MyFileIO::print_out(\@rlk_out_tsv, $rlk_output);
 raid::MyFileIO::print_out(\@other_rlk_out_tsv, $other_rlk_output);
 
 my $rlk_count_num = @rlk_out_tsv;
+$rlk_count_num = $rlk_count_num - 1;
 print $tee_add "$rlk_count_num RLKs scanned.\n";
 my $end_time = localtime;
 print $tee_add "==> Finished at $end_time!\n";
