@@ -7,9 +7,10 @@
 # Version: 1.1.0
 #
 # Change logs:
-# Version: 1.0.0 23-06-14: The initial version.
-# Version: 1.0.1 23-06-28: Bug fixes: Col3 DESC will remove the first _, add a judge of the input file.
-# Version: 1.1.0 23-06-28: Add GetOptions part and use MyFileIO module.
+# Update: 23-06-14: The initial version.
+# Update: 23-06-28: Bug fixes: Col3 DESC will remove the first _, add a judge of the input file.
+# Update: 23-06-28: Add GetOptions part and use MyFileIO module.
+# Update: 24-01-05: unshift to print out the headline to the first line.
 
 use strict;
 use warnings;
@@ -94,7 +95,7 @@ while( <$fh_in> ) {
 close $fh_in;
 
 my $head = "NAME\tACC\tDESC\tLENG";
-push @output, $head;
+unshift @output, $head;
 
 raid::MyFileIO::print_out(\@output, $out);
 
