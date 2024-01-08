@@ -191,7 +191,7 @@ sub seq_trunc {
         my $seqinfo = $seqinfo_ref -> {$id};
         for ( @{$seqinfo} ) {
             my ($domain, $start, $stop) = split/,/, $_;
-            my $seq_name = "$id","_","$domain","_","$start","_","$stop";
+            my $seq_name = "$id"."_"."$domain"."_"."$start"."_"."$stop";
             my $sequence = $seq_ref -> {$id};
             my $seq_start = $start - 1;
             my $seq_len = $stop - $start + 1;
