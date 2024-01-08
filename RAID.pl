@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-08-10
-# Version: 1.2.5
+# Version: 1.2.6
 #
 # Change logs:
 # Version 1.0.0 2023-08-10: The initial version. Realize automatically RLK scanning from a protein fasta file.
@@ -21,6 +21,7 @@
 # Version 1.2.4 2023-10-08: All ECD were unified to None for better viewing. Add headline to RLK.others.tsv.
 #                           Bug fixes: RLK numbers count without headline.
 # Version 1.2.5 2023-11-13: Bug fixes: Some RLKs will get only # as ECD (which means they are RLK_WE)
+# Version 1.2.6 2024-01-08: Bug fixes: removing those fake RLKs and probably fake domains.
 
 use strict;
 use warnings;
@@ -48,7 +49,7 @@ RAID.pl -- RLK Auto-IDentifier
 
 =head1 SYNOPSIS
 
-    RAID.pl (version 1.2.5)
+    RAID.pl (version 1.2.6)
         RLK Automatical IDentifier searching RLKs among protein.fa files.
 
     Usage:
@@ -112,8 +113,7 @@ unless ( path("$outdir/log.txt") -> is_file ) {
 
 # value usage
 my $defaulte = Math::BigFloat -> new('1e-10');
-my $i = 0;
-my $gene_name;
+my $defaulte_others = Math::BigFloat -> new('1e-3');
 my $tee_add = IO::Tee -> new ( ">> $outdir/log.txt", \*STDERR );
 my (%DOMAIN_info, %SEQUENCE, %TM_info, %RLK);
 my @PKD = ("Pkinase", "PK_Tyr_Ser-Thr", "Pkinase_fungal", "Pkinase_C");
@@ -159,30 +159,7 @@ else {
 
 # read the scan result via hmmscan
 my $DOMAIN_info_ref = \%DOMAIN_info;
-my @hmmresult = raid::MyFileIO::read_hmm_txt($pfam_txt);
-
-# input hmm result to a hash
-for ( @hmmresult ) {
-    my @col = split/\t/, $_;
-    if ( !defined $gene_name ) {
-        $gene_name = $col[0];
-        my $info = "$col[1],$col[2],$col[3],$col[4]";
-        $DOMAIN_info_ref -> {$col[0]} -> [$i] = $info;
-        $i++;
-    }
-    elsif ( $gene_name eq $col[0] ) {
-        my $info = "$col[1],$col[2],$col[3],$col[4]";
-        $DOMAIN_info_ref -> {$col[0]} -> [$i] = $info;
-        $i++;
-    }
-    elsif ( $gene_name ne $col[0] ) {
-        $gene_name = $col[0];
-        $i = 0;
-        my $info = "$col[1],$col[2],$col[3],$col[4]";
-        $DOMAIN_info_ref -> {$col[0]} -> [$i] = $info;
-        $i++;
-    }
-}
+raid::MyFileIO::read_hmm_txt($DOMAIN_info_ref, $pfam_txt);
 
 
 #----------------------------------------------------------#
@@ -218,7 +195,7 @@ raid::MyFileIO::print_out(\@write_hmm_tsv, $pfam_tsv);
 @query_with_pkd = uniq (@query_with_pkd);
 my $kd_num = @query_with_pkd;
 if ( $kd_num != 0 ) {
-    print $tee_add "Detected totally $kd_num proteins with Pkinase domains.\n";
+    print $tee_add "Detected totally $kd_num proteins with true Pkinase domains.\n";
     print $tee_add "\n";
 }
 else {
@@ -243,6 +220,7 @@ if ( !path($tmbed_pred) -> is_file || defined $forcetmd ) {
     my $tmbedresult = tmbed($kd_seq, $batchsize, $tmbed_pred);
     if ($tmbedresult != 0) {
         print $tee_add "Error: tmbed interrupted.\n";
+        print $tee_add "\n";
         die;
     }
 }
@@ -259,6 +237,7 @@ if ( $kd_num == $pred_num ) {
 }
 else {
     print $tee_add "Something went wrong when running tmbed, please check tmbed sequences.\n";
+    print "\n";
     die;
 }
 
@@ -282,15 +261,27 @@ raid::DomUtil::domain_sort(\%DOMAIN_info, "4", "3", ",");
 
 for ( @query_with_pkd ) {
     my $id = $_;
-    my $array_ref = $DOMAIN_info_ref -> {$id};
+    my $domain_ref = $DOMAIN_info_ref -> {$id};
 
-    for ( @{$array_ref} ) {
+    for ( @{$domain_ref} ) {
         my @output = split /,/, $_;
+        my $dom_array_e = Math::BigFloat -> new ($output[1]);
         if ( grep { $_ eq $output[0] } @PKD ) {
-            $output[0] = "Kinase";
+            if ( $dom_array_e <= $defaulte ) {
+                $output[0] = "Kinase";
+            }
+            else {
+                $output[0] = "Fake_kinase";
+            }
+            my $outline = "$id\t$output[0]\t$output[2]\t$output[3]";
+            push @final_domain_tsv, $outline;
         }
-        my $outline = "$id\t$output[0]\t$output[2]\t$output[3]";
-        push @final_domain_tsv, $outline;
+        else {
+            if ( $dom_array_e <= $defaulte_others ) {
+                my $outline = "$id\t$output[0]\t$output[2]\t$output[3]";
+                push @final_domain_tsv, $outline;
+            }
+        }
     }
 }
 
@@ -396,7 +387,7 @@ sub COUNT_SUB_STR {
 
 =head1 VERSION
 
-1.2.5
+1.2.6
 
 =head1 AUTHORS
 

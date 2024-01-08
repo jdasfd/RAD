@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
-# Version: 1.2.1
+# Version: 1.2.2
 #
 # Change logs:
 # Version 1.0.0 2023-06-08: Initial version. Add function codon_translate.
@@ -13,6 +13,7 @@
 # Version 1.1.1 2023-08-14: Add function seq_some, seq_replace.
 # Version 1.2.0 2023-08-14: Add function seq_trunc, but not finished yet.
 # Version 1.2.1 2023-08-15: Bug fixes for fasta output without > as id start.
+# Version 1.2.2 2024-01-08: Complete seq_trunc.
 
 =head1 NAME
 
@@ -176,7 +177,7 @@ sub seq_replace {
       About : Truncating sequences according to domain info.
       Usage : my @for_print = seq_trunc(\%SEQUENCE, \%SEQ_INFO, \@id);
        Args : Hash with all sequences;
-              hash with all domain info;
+              hash with truncated domain info (domain,start,stop without e-value info);
               array saved all id.
     Returns : Printing format of sequences.
 
@@ -188,7 +189,15 @@ sub seq_trunc {
     for ( @{$id_ref} ) {
         my $id = $_;
         my $seqinfo = $seqinfo_ref -> {$id};
-        my ($start, $stop);
+        for ( @{$seqinfo} ) {
+            my ($domain, $start, $stop) = split/,/, $_;
+            my $seq_name = "$id","_","$domain","_","$start","_","$stop";
+            my $sequence = $seq_ref -> {$id};
+            my $seq_start = $start - 1;
+            my $seq_len = $stop - $start + 1;
+            my $truc_seq = substr($sequence, $seq_start, $seq_len);
+            push @for_print, ">$seq_name\n$truc_seq";
+        }
     }
 
     return @for_print;
@@ -198,7 +207,7 @@ sub seq_trunc {
 
 =head1 VERSION
 
-1.2.1
+1.2.2
 
 =head1 AUTHOR
 

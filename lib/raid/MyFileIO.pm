@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
-# Version: 1.5.0
+# Version: 1.5.1
 #
 # Change logs:
 # Version 1.0.0 2023-06-08: Initial version. Add function getInputFilehandle, read_pred.
@@ -16,6 +16,7 @@
 # Version 1.3.0 2023-08-13: Add function read_hmm_txt.
 # Version 1.4.0 2023-08-13: Add function read_fasta. Remove get_longest_trans codes for changing.
 # Version 1.5.0 2023-08-15: Add function extract_pred_info.
+# Version 1.5.1 2024-01-08: Change read_hmm_txt to return a hash ref
 
 =head1 NAME
 
@@ -244,15 +245,14 @@ sub extract_pred_info {
 
 =head2 read_hmm_txt
 
-    About : Reading hmmscan result via Bio::SearchIO to tsv format
-    Usage : my @for_print = read_hmm_txt($in);
+    About : Reading hmmscan result via Bio::SearchIO
+    Usage : read_hmm_txt(\%DOMAIN_info, $in);
      Args : Hmmscan result txt filename (.txt format)
-  Returns : @for_print (each element contains an array string in tsv format)
+  Returns : Nothing (Save csv formatted array string of domains to a hash)
 
 =cut
 sub read_hmm_txt {
-    my ($in) = @_;
-    my @for_print;
+    my ($domain_ref, $in) = @_;
 
     my $searchio = Bio::SearchIO -> new (
         -format     => 'hmmer',
@@ -268,13 +268,11 @@ sub read_hmm_txt {
                 my $evalue = $hsp -> evalue();
                 my $start = $hsp -> start('query');
                 my $end = $hsp -> end('query');
-                my $for_print = "$query\t$hit_name\t$evalue\t$start\t$end";
-                push @for_print, $for_print;
+                my $dom_info = "$hit_name,$evalue,$start,$end";
+                push @{$domain_ref -> {$query}}, $dom_info;
             }
         }
     }
-
-    return @for_print;
 }
 
 =head2 read_fasta
@@ -309,7 +307,7 @@ sub read_fasta {
 
 =head1 VERSION
 
-1.5.0
+1.5.1
 
 =head1 AUTHOR
 
