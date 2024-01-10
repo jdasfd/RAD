@@ -347,12 +347,18 @@ for my $keys (keys %RLK) {
 raid::MyFileIO::print_out(\@rlk_out_tsv, $rlk_output);
 raid::MyFileIO::print_out(\@other_rlk_out_tsv, $other_rlk_output);
 
+
+#----------------------------------------------------------#
+# Finish
+#----------------------------------------------------------#
+
 my $rlk_count_num = @rlk_out_tsv;
 $rlk_count_num = $rlk_count_num - 1;
 print $tee_add "$rlk_count_num RLKs scanned.\n";
 my $end_time = localtime;
 print $tee_add "==> Finished at $end_time!\n";
 print $tee_add "\n";
+
 
 #----------------------------------------------------------#
 # Sub program
