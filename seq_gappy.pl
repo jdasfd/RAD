@@ -73,7 +73,7 @@ while((my $seqobj = $seqIOobj -> next_seq())) {
 }
 
 # sort to validate the output order
-for my $gene ( sort { $SEQUENCE{$b} <=> $SEQUENCE{$a} } keys %SEQUENCE) {
+for my $gene ( sort keys %SEQUENCE) {
     my $seq = $SEQUENCE{$gene};
     my $seq_len = length($seq);
     my $gap_len = $seq =~ tr/-/-/;
