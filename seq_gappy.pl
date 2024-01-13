@@ -57,37 +57,24 @@ elsif ( $cutoff > 100 || $cutoff < 0) {
     die "Error: cutoff ranged from 0-100!";
 }
 
-our %SEQUENCE;
-my @print;
-
 # read fasta file
 my $seqIOobj = Bio::SeqIO -> new(
     -file       =>  "$fasta_file",
     '-format'   =>  'Fasta'
 );
 
+# filter all sequence with gaps
 while((my $seqobj = $seqIOobj -> next_seq())) {
     my $id = $seqobj -> id();
     my $seq = $seqobj -> seq();
-    $SEQUENCE{$id} = $seq;
-}
-
-# sort to validate the output order
-for my $gene ( sort keys %SEQUENCE) {
-    my $seq = $SEQUENCE{$gene};
     my $seq_len = length($seq);
     my $gap_len = $seq =~ tr/-/-/;
     my $ratio = $gap_len/$seq_len*100;
-    $ratio = sprintf "%.2f", $ratio;
-    if ( $ratio <=  $cutoff ) {
-        my $filter_seq = ">$gene\n$seq";
-        push @print, $filter_seq;
+    $ratio = sprintf "%.3f", $ratio;
+    if ( $ratio <= $cutoff ) {
+        print ">$id\n";
+        print "$seq\n";
     }
-}
-
-END{
-    print join "\n", @print;
-    print "\n";
 }
 
 __END__
