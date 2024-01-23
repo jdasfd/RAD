@@ -22,6 +22,7 @@
 #                           Bug fixes: RLK numbers count without headline.
 # Version 1.2.5 2023-11-13: Bug fixes: Some RLKs will get only # as ECD (which means they are RLK_WE)
 # Version 1.2.6 2024-01-08: Bug fixes: removing those fake RLKs and probably fake domains.
+# Version 1.2.7 2024-01-23: Bug fixes: RLKs finding process. Will count something not RLKs.
 
 use strict;
 use warnings;
@@ -49,7 +50,7 @@ RAID.pl -- RLK Auto-IDentifier
 
 =head1 SYNOPSIS
 
-    RAID.pl (version 1.2.6)
+    RAID.pl (version 1.2.7)
         RLK Automatical IDentifier searching RLKs among protein.fa files.
 
     Usage:
@@ -330,12 +331,12 @@ for my $keys (keys %RLK) {
             }
         }
         elsif ($domain_list =~ /TMD_i2o/) {
-            my $outline = "$keys\tRLK_reverse\tNone\t$KD_count";
+            my $outline = "$keys\tRLK_RvrTMD\tNone\t$KD_count";
             push @other_rlk_out_tsv, $outline;
         }
         else {
-            my $outline = "$keys\tRLK_WE\tNone\t$KD_count";
-            push @rlk_out_tsv, $outline;
+            my $outline = "$keys\tOthers\tNone\t$KD_count";
+            push @other_rlk_out_tsv, $outline;
         }
     }
     else {
@@ -393,7 +394,7 @@ sub COUNT_SUB_STR {
 
 =head1 VERSION
 
-1.2.6
+1.2.7
 
 =head1 AUTHORS
 
