@@ -335,7 +335,7 @@ for my $keys (keys %RLK) {
             push @other_rlk_out_tsv, $outline;
         }
         else {
-            if ( /^TMD_o2i.+?Kinase.*/ ) {
+            if ( $domain_list =~ /^TMD_o2i.+?Kinase.*/ ) {
                 my $outline = "$keys\tRLK_WE\tNone\t$KD_count";
                 push @rlk_out_tsv, $outline;
             }
