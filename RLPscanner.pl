@@ -7,6 +7,7 @@
 
 # Change logs:
 # 2024-04-06: The initial version. Realize automatically RLP scanning.
+# 2024-04-07: Uniq all transmembrane genes avoiding repeated output to Pro.final.domain.tsv.
 
 use strict;
 use warnings;
@@ -81,7 +82,7 @@ else {
 
 # value usage
 my $defaulte = Math::BigFloat -> new('1e-3');
-my (%DOMAIN_info, %TM_info, %RLP_like);
+my (%DOMAIN_info, %TM_info, %PRO_TRANS, %RLP_like);
 my (@tmdlist, @final_domain_tsv, @rlp_out_tsv);
 
 # all output path
@@ -119,6 +120,9 @@ for my $gene ( keys %DOMAIN_info ) {
         }
     }
 }
+
+# uniq tmd list avoiding repeats
+@tmdlist = uniq (@tmdlist);
 
 for ( @tmdlist ) {
     my $id = $_;
@@ -163,7 +167,7 @@ for my $keys (keys %RLP_like) {
                 push @rlp_out_tsv, $outline;
             }
             else {
-                my $outline = "$keys\tRLPUN\tUnknown";
+                my $outline = "$keys\tPro_TMD\tUnknown";
                 push @rlp_out_tsv, $outline;
             }
         }
@@ -172,3 +176,5 @@ for my $keys (keys %RLP_like) {
 
 # write into rlp tsv
 raid::MyFileIO::print_out(\@rlp_out_tsv, $rlp_output);
+
+__END__
