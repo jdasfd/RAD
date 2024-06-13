@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
-# Version: 1.2.2
+# Version: 1.2.3
 #
 # Change logs:
 # Version 1.0.0 2023-06-08: Initial version. Add function codon_translate.
@@ -14,6 +14,7 @@
 # Version 1.2.0 2023-08-14: Add function seq_trunc, but not finished yet.
 # Version 1.2.1 2023-08-15: Bug fixes for fasta output without > as id start.
 # Version 1.2.2 2024-01-08: Complete seq_trunc.
+# Version 1.2.3 2024-06-13: Add X to represent the abnormal cds.
 
 =head1 NAME
 
@@ -122,6 +123,9 @@ sub codon_translate {
         if ($codon{$nt_seq[$i]}) {
             push @pep_seq, $codon{$nt_seq[$i]};
         }
+        else {
+            push @pep_seq, "X";
+        }
     }
     my $out_pep = join '', @pep_seq;
     return $out_pep;
@@ -207,7 +211,7 @@ sub seq_trunc {
 
 =head1 VERSION
 
-1.2.2
+1.2.3
 
 =head1 AUTHOR
 
