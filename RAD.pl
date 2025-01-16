@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# RAID.pl -- RLK Auto-IDentifier
+# RAD.pl -- RLK Auto-IDentifier
 #
 # Author: Yuqian Jiang
 # Created: 2023-08-10
