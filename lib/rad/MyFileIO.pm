@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
-# Version: 1.5.1
+# Version: 1.5.2
 #
 # Change logs:
 # Version 1.0.0 2023-06-08: Initial version. Add function getInputFilehandle, read_pred.
@@ -17,18 +17,19 @@
 # Version 1.4.0 2023-08-13: Add function read_fasta. Remove get_longest_trans codes for changing.
 # Version 1.5.0 2023-08-15: Add function extract_pred_info.
 # Version 1.5.1 2024-01-08: Change read_hmm_txt to return a hash ref
+# Version 1.5.2 2025-04-22: Change package name to rad
 
 =head1 NAME
 
-raid::MyFileIO - Local perl module for operating files
+rad::MyFileIO - Local perl module for operating files
 
 =head1 SYNOPSIS
 
-    use raid::MyFileIO;
+    use rad::MyFileIO;
 
 =cut
 
-package raid::MyFileIO;
+package rad::MyFileIO;
 
 use strict;
 use warnings;
@@ -307,7 +308,7 @@ sub read_fasta {
 
 =head1 VERSION
 
-1.5.1
+1.5.2
 
 =head1 AUTHOR
 

@@ -4,25 +4,26 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-07-20
-# Version: 1.3.0
+# Version: 1.3.1
 #
 # Change logs:
 # Version 1.0.0 2023-07-20: Initial version. Add function domain_unified but need updating.
 # Version 1.1.0 2023-08-13: Add function domain_sort.
 # Version 1.2.0 2023-08-15: Add function domain_filter.
 # Version 1.3.0 2023-09-28: Remove function domain_unified.
+# Version 1.3.1 2025-04-22: Change package name to rad
 
 =head1 NAME
 
-raid::DomUtil - Local perl module for operating domains
+rad::DomUtil - Local perl module for operating domains
 
 =head1 SYNOPSIS
 
-    use raid::DomUtil;
+    use rad::DomUtil;
 
 =cut
 
-package raid::DomUtil;
+package rad::DomUtil;
 
 use strict;
 use warnings;
@@ -108,7 +109,7 @@ sub domain_filter {
 
 =head1 VERSION
 
-1.3.0
+1.3.1
 
 =head1 AUTHOR
 

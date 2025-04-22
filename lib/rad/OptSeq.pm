@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-06-08
-# Version: 1.2.3
+# Version: 1.2.4
 #
 # Change logs:
 # Version 1.0.0 2023-06-08: Initial version. Add function codon_translate.
@@ -15,18 +15,19 @@
 # Version 1.2.1 2023-08-15: Bug fixes for fasta output without > as id start.
 # Version 1.2.2 2024-01-08: Complete seq_trunc.
 # Version 1.2.3 2024-06-13: Add X to represent the abnormal cds.
+# Version 1.2.4 2025-04-22: Change package name to rad
 
 =head1 NAME
 
-raid::OptSeq - Converting some results into the specific types
+rad::OptSeq - Converting some results into the specific types
 
 =head1 SYNOPSIS
 
-    use raid::OptSeq qw();
+    use rad::OptSeq qw();
 
 =cut
 
-package raid::OptSeq;
+package rad::OptSeq;
 use strict;
 use warnings;
 use autodie;
@@ -211,7 +212,7 @@ sub seq_trunc {
 
 =head1 VERSION
 
-1.2.3
+1.2.4
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-08-10
-# Version: 1.2.6
+# Version: 1.2.8
 #
 # Change logs:
 # Version 1.0.0 2023-08-10: The initial version. Realize automatically RLK scanning from a protein fasta file.
@@ -23,6 +23,7 @@
 # Version 1.2.5 2023-11-13: Bug fixes: Some RLKs will get only # as ECD (which means they are RLK_WE)
 # Version 1.2.6 2024-01-08: Bug fixes: removing those fake RLKs and probably fake domains.
 # Version 1.2.7 2024-01-23: Bug fixes: RLKs finding process. Will count something not RLKs.
+# Version 1.2.8 2025-04-22: Change name to RAD.pl
 
 use strict;
 use warnings;
@@ -35,9 +36,9 @@ use Data::Dumper;
 use Math::BigFloat;
 use FindBin qw/$Bin/;
 use lib "$FindBin::Bin/lib/";
-use raid::MyFileIO;
-use raid::DomUtil;
-use raid::OptSeq;
+use rad::MyFileIO;
+use rad::DomUtil;
+use rad::OptSeq;
 
 
 #----------------------------------------------------------#
@@ -46,11 +47,11 @@ use raid::OptSeq;
 
 =head1 NAME
 
-RAID.pl -- RLK Auto-IDentifier
+RAD.pl -- RLK Auto-IDentifier
 
 =head1 SYNOPSIS
 
-    RAID.pl (version 1.2.7)
+    RAD.pl (version 1.2.8)
         RLK Automatical IDentifier searching RLKs among protein.fa files.
 
     Usage:
@@ -122,7 +123,7 @@ my (@query_with_pkd, @write_hmm_tsv, @final_domain_tsv, @rlk_out_tsv, @other_rlk
 
 # sequence read to hash
 # start information record to log
-my @all_seq_id = raid::MyFileIO::read_fasta(\%SEQUENCE, $input);
+my @all_seq_id = rad::MyFileIO::read_fasta(\%SEQUENCE, $input);
 my $all_seq_num = @all_seq_id;
 print $tee_add "Start to scan $all_seq_num proteins inside the fasta file!\n";
 print $tee_add "Input: $input.\n";
@@ -160,7 +161,7 @@ else {
 
 # read the scan result via hmmscan
 my $DOMAIN_info_ref = \%DOMAIN_info;
-raid::MyFileIO::read_hmm_txt($DOMAIN_info_ref, $pfam_txt);
+rad::MyFileIO::read_hmm_txt($DOMAIN_info_ref, $pfam_txt);
 
 
 #----------------------------------------------------------#
@@ -169,7 +170,7 @@ raid::MyFileIO::read_hmm_txt($DOMAIN_info_ref, $pfam_txt);
 
 # sort hash ascendingly according to e-value
 # domain_sort function could be seen in the perl module locally
-raid::DomUtil::domain_sort(\%DOMAIN_info, "4", "2", ",");
+rad::DomUtil::domain_sort(\%DOMAIN_info, "4", "2", ",");
 
 for my $gene ( keys %DOMAIN_info ) {
     my $info = $DOMAIN_info_ref -> {$gene};
@@ -190,7 +191,7 @@ for my $gene ( keys %DOMAIN_info ) {
 }
 
 # output into tsv according to the hmm txt result
-raid::MyFileIO::print_out(\@write_hmm_tsv, $pfam_tsv);
+rad::MyFileIO::print_out(\@write_hmm_tsv, $pfam_tsv);
 
 # combined with pkd results.
 @query_with_pkd = uniq (@query_with_pkd);
@@ -205,10 +206,10 @@ else {
 }
 
 # Proteins with KD saved to list and fa files
-raid::MyFileIO::print_out(\@query_with_pkd, $pro_with_kd);
+rad::MyFileIO::print_out(\@query_with_pkd, $pro_with_kd);
 
-my @KD_fa = raid::OptSeq::seq_some(\%SEQUENCE, \@query_with_pkd);
-raid::MyFileIO::print_out(\@KD_fa, $kd_seq);
+my @KD_fa = rad::OptSeq::seq_some(\%SEQUENCE, \@query_with_pkd);
+rad::MyFileIO::print_out(\@KD_fa, $kd_seq);
 
 
 #----------------------------------------------------------#
@@ -230,7 +231,7 @@ else {
 }
 
 # dealing with the tmbed result
-raid::MyFileIO::read_pred(\%TM_info, $tmbed_pred);
+rad::MyFileIO::read_pred(\%TM_info, $tmbed_pred);
 my $pred_num = keys %TM_info;
 print $tee_add "TMbed result contains $pred_num proteins.\n";
 if ( $kd_num == $pred_num ) {
@@ -242,9 +243,9 @@ else {
     die;
 }
 
-raid::MyFileIO::extract_pred_info(\%DOMAIN_info, \%TM_info);
+rad::MyFileIO::extract_pred_info(\%DOMAIN_info, \%TM_info);
 # sort all domains with SP and TMD inside
-raid::DomUtil::domain_sort(\%DOMAIN_info, "4", "2", ",");
+rad::DomUtil::domain_sort(\%DOMAIN_info, "4", "2", ",");
 
 #print Dumper \%DOMAIN_info;
 print $tee_add "\n";
@@ -257,8 +258,8 @@ print $tee_add "\n";
 print $tee_add "==> Start to deal with domains.\n";
 
 # domain filter and sort according to start pos
-raid::DomUtil::domain_filter(\%DOMAIN_info);
-raid::DomUtil::domain_sort(\%DOMAIN_info, "4", "3", ",");
+rad::DomUtil::domain_filter(\%DOMAIN_info);
+rad::DomUtil::domain_sort(\%DOMAIN_info, "4", "3", ",");
 
 for ( @query_with_pkd ) {
     my $id = $_;
@@ -289,7 +290,7 @@ for ( @query_with_pkd ) {
 # write to final tsv (only contained all pkinase pros)
 print $tee_add "\n";
 print $tee_add "==> Final domain result output.\n";
-raid::MyFileIO::print_out(\@final_domain_tsv, $domain_final);
+rad::MyFileIO::print_out(\@final_domain_tsv, $domain_final);
 
 
 #----------------------------------------------------------#
@@ -303,7 +304,7 @@ print $tee_add "\n";
 print $tee_add "==> Scanning RLKs.\n";
 
 # avoid confusing, reinduced the final domain tsv
-my $final_in = raid::MyFileIO::getInputFilehandle($domain_final);
+my $final_in = rad::MyFileIO::getInputFilehandle($domain_final);
 while ( <$final_in> ) {
     chomp;
     my @array = split/\t/, $_;
@@ -351,8 +352,8 @@ for my $keys (keys %RLK) {
     }
 }
 
-raid::MyFileIO::print_out(\@rlk_out_tsv, $rlk_output);
-raid::MyFileIO::print_out(\@other_rlk_out_tsv, $other_rlk_output);
+rad::MyFileIO::print_out(\@rlk_out_tsv, $rlk_output);
+rad::MyFileIO::print_out(\@other_rlk_out_tsv, $other_rlk_output);
 
 
 #----------------------------------------------------------#
@@ -400,7 +401,7 @@ sub COUNT_SUB_STR {
 
 =head1 VERSION
 
-1.2.7
+1.2.8
 
 =head1 AUTHORS
 

@@ -23,7 +23,7 @@ use Bio::Seq;
 use Bio::SeqIO;
 use FindBin qw/$Bin/;
 use lib "$FindBin::Bin/lib/";
-use raid::MyFileIO;
+use rad::MyFileIO;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -81,7 +81,7 @@ my (@GFFLINES, @f_array, @for_print);
 
 print STDERR "==> Start to extract longest pep.\n";
 
-my $gff_in = raid::MyFileIO::getInputFilehandle($gff_file);
+my $gff_in = rad::MyFileIO::getInputFilehandle($gff_file);
 
 while ( <$gff_in> ) {
     chomp;
@@ -95,7 +95,7 @@ close $gff_in;
 my @f_uniq = List::Util::uniq @f_array;
 if ( List::Util::any { $_ eq "mRNA" || $_ eq "pseudogenic_transcript" || $_ eq "transcript" } @f_uniq ) {
     if ( List::Util::any { $_ =~ /.*mRNA.*Parent.*/ } @GFFLINES ) {
-        #raid::MyFileIO::get_longest_trans(\%LONGEST, $gff_file);
+        #rad::MyFileIO::get_longest_trans(\%LONGEST, $gff_file);
         print STDERR "==> This part is waiting to update QAQ!\n";
     }
     else {
@@ -125,7 +125,7 @@ if ( List::Util::any { $_ eq "mRNA" || $_ eq "pseudogenic_transcript" || $_ eq "
             }
         }
 
-        raid::MyFileIO::print_out(\@for_print, $output);
+        rad::MyFileIO::print_out(\@for_print, $output);
         my $seq_num = @for_print;
         print STDERR "==> Extract $seq_num sequences from GFF\n";
     }
@@ -144,7 +144,7 @@ else {
         push @for_print, $for_print;
     }
 
-    raid::MyFileIO::print_out(\@for_print, $output);
+    rad::MyFileIO::print_out(\@for_print, $output);
     my $seq_num = @for_print;
     print STDERR "==> All $seq_num sequences are still in.\n";
 }
