@@ -112,7 +112,7 @@ for (@filter_seq) {
     push @for_print, $print;
 }
 
-raid::MyFileIO::print_out(\@for_print, $out);
+rad::MyFileIO::print_out(\@for_print, $out);
 
 #----------------------------------------------------------#
 # sub
