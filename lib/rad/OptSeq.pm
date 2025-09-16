@@ -36,7 +36,7 @@ use autodie;
 
 =head2 codon_translate
 
-      About : Tranlating CDS to proteins.
+      About : Translating CDS to proteins.
       Usage : my $pep_seq = codon_translate($dna_seq)
        Args : Codon translator.
     Returns : Pep sequences.
