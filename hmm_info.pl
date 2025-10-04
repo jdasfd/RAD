@@ -19,7 +19,7 @@ use Path::Tiny;
 use Getopt::Long;
 use FindBin qw/$Bin/;
 use lib "$FindBin::Bin/lib/";
-use raid::MyFileIO;
+use rad::MyFileIO;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -64,7 +64,7 @@ elsif ( !$input =~ /\.hmm.*$/ ) {
 my ($readline, $line_num);
 my @output = ();
 
-my $fh_in = raid::MyFileIO::getInputFilehandle($input);
+my $fh_in = rad::MyFileIO::getInputFilehandle($input);
 while( <$fh_in> ) {
     $line_num++;
     if ( $_ =~ /\/\// ) {
@@ -97,6 +97,6 @@ close $fh_in;
 my $head = "NAME\tACC\tDESC\tLENG";
 unshift @output, $head;
 
-raid::MyFileIO::print_out(\@output, $out);
+rad::MyFileIO::print_out(\@output, $out);
 
 __END__
