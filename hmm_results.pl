@@ -17,7 +17,7 @@ use Bio::SearchIO;
 use Getopt::Long;
 use FindBin qw/$Bin/;
 use lib "$FindBin::Bin/lib/";
-use raid::MyFileIO;
+use rad::MyFileIO;
 
 #----------------------------------------------------------#
 # GetOpt section

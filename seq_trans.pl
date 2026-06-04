@@ -15,8 +15,8 @@ use Bio::Seq;
 use Bio::SeqIO;
 use FindBin qw/$Bin/;
 use lib "$FindBin::Bin/lib/";
-use raid::MyFileIO;
-use raid::OptSeq;
+use rad::MyFileIO;
+use rad::OptSeq;
 
 #----------------------------------------------------------#
 # GetOpt section
