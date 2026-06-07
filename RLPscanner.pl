@@ -19,9 +19,9 @@ use Data::Dumper;
 use Math::BigFloat;
 use FindBin qw/$Bin/;
 use lib "$FindBin::Bin/lib/";
-use raid::MyFileIO;
-use raid::DomUtil;
-use raid::OptSeq;
+use rad::MyFileIO;
+use rad::DomUtil;
+use rad::OptSeq;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -95,20 +95,20 @@ my $rlp_output = $outdir."/RLP.tsv";
 
 # input the scan result via hmmscan
 my $DOMAIN_info_ref = \%DOMAIN_info;
-raid::MyFileIO::read_hmm_txt($DOMAIN_info_ref, $domain);
+rad::MyFileIO::read_hmm_txt($DOMAIN_info_ref, $domain);
 # domain_sort function could be seen in the perl module locally
-raid::DomUtil::domain_sort(\%DOMAIN_info, "4", "2", ",");
+rad::DomUtil::domain_sort(\%DOMAIN_info, "4", "2", ",");
 
 # dealing with the tmbed result
-raid::MyFileIO::read_pred(\%TM_info, $tmbed);
+rad::MyFileIO::read_pred(\%TM_info, $tmbed);
 
-raid::MyFileIO::extract_pred_info(\%DOMAIN_info, \%TM_info);
+rad::MyFileIO::extract_pred_info(\%DOMAIN_info, \%TM_info);
 # sort all domains with SP and TMD inside
-raid::DomUtil::domain_sort(\%DOMAIN_info, "4", "2", ",");
+rad::DomUtil::domain_sort(\%DOMAIN_info, "4", "2", ",");
 
 # domain filter and sort according to start pos
-raid::DomUtil::domain_filter(\%DOMAIN_info);
-raid::DomUtil::domain_sort(\%DOMAIN_info, "4", "3", ",");
+rad::DomUtil::domain_filter(\%DOMAIN_info);
+rad::DomUtil::domain_sort(\%DOMAIN_info, "4", "3", ",");
 
 # get all pros with tmd
 for my $gene ( keys %DOMAIN_info ) {
@@ -139,13 +139,13 @@ for ( @tmdlist ) {
 }
 
 # write to final tsv with TMD and SP
-raid::MyFileIO::print_out(\@final_domain_tsv, $domain_final);
+rad::MyFileIO::print_out(\@final_domain_tsv, $domain_final);
 
 my $headline = "Name\tType\tECD";
 push @rlp_out_tsv, $headline;
 
 # reinduced the final domain tsv
-my $final_in = raid::MyFileIO::getInputFilehandle($domain_final);
+my $final_in = rad::MyFileIO::getInputFilehandle($domain_final);
 while ( <$final_in> ) {
     chomp;
     my @array = split/\t/, $_;
@@ -175,6 +175,6 @@ for my $keys (keys %RLP_like) {
 }
 
 # write into rlp tsv
-raid::MyFileIO::print_out(\@rlp_out_tsv, $rlp_output);
+rad::MyFileIO::print_out(\@rlp_out_tsv, $rlp_output);
 
 __END__

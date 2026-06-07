@@ -5,7 +5,7 @@
 # Author: Yuqian Jiang
 # Created: 2023-10-11
 # Modified: 2023-12-20
-# Decided to put it into RAID tool-box for filtering gappy sequences
+# Decided to put it into RAD tool-box for filtering gappy sequences
 
 use strict;
 use warnings;

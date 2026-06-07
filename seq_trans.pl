@@ -69,10 +69,10 @@ while ((my $seqobj = $seqIOobj -> next_seq())) {
     my $id = $seqobj -> id();
     my $seq = $seqobj -> seq();
     next unless ( length($seq)%3 == 0 );
-    my $pep_seq = raid::OptSeq::codon_translate($seq);
+    my $pep_seq = rad::OptSeq::codon_translate($seq);
     push @for_print, ">$id\n$pep_seq";
 }
 
-raid::MyFileIO::print_out(\@for_print, $out);
+rad::MyFileIO::print_out(\@for_print, $out);
 
 __END__

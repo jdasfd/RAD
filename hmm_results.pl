@@ -84,6 +84,6 @@ while ( my $result = $searchio -> next_result() ) {
     }
 }
 
-raid::MyFileIO::print_out(\@for_print, $out);
+rad::MyFileIO::print_out(\@for_print, $out);
 
 __END__

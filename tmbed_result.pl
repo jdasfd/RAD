@@ -60,7 +60,7 @@ elsif ( !path($fasta_file) -> is_file ) {
 my %INDEXs;
 my @bed_format;
 
-raid::MyFileIO::read_pred(\%INDEXs, $fasta_file);
+rad::MyFileIO::read_pred(\%INDEXs, $fasta_file);
 
 for my $id (keys %INDEXs) {
     my $sp_set = AlignDB::IntSpan -> new;
@@ -114,6 +114,6 @@ for my $id (keys %INDEXs) {
     }
 }
 
-raid::MyFileIO::print_out(\@bed_format, $out);
+rad::MyFileIO::print_out(\@bed_format, $out);
 
 __END__
