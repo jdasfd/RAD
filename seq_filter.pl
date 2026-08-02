@@ -4,12 +4,12 @@
 #
 # Author: Yuqian Jiang
 # Created: 2023-07-05
-# Version: 1.0.2
 #
 # Change logs:
 # Version 1.0.0 23-07-05: The initial version.
 # Version 1.0.1 23-07-05: Bug fixes. Remove arg: --changestop. Default change id and stop codon.
 # Version 1.0.2 23-07-05: Add new module Array::Utils for intersect fuction and remove intersect sub.
+# Version 1.0.3 26-08-03: --prestop bug fixed: now can remove the last stop codon.
 
 use strict;
 use warnings;
@@ -145,9 +145,8 @@ sub filter_pre_stop {
     my @filter;
 
     for my $id ( keys %{$seq_hash} ) {
-        my $seq = $seq_hash -> {$id};
-        $seq =~ s/\*$//;
-        unless ( $seq =~ /\*/ ) {
+        $seq_hash -> {$id} =~ s/\*$//;
+        unless ( $seq_hash -> {$id} =~ /\*/ ) {
             push @filter, $id;
         }
     }
